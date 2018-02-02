@@ -1,4 +1,4 @@
-package io.inabsentia.hangman.controller;
+package io.inabsentia.distributedhangman.controller.exceptions;
 
 public class UserControllerException extends Exception {
 

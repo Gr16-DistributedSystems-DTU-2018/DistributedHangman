@@ -1,4 +1,4 @@
-package io.inabsentia.hangman.logic;
+package io.inabsentia.distributedhangman.logic;
 
 import java.util.ArrayList;
 import java.util.List;
