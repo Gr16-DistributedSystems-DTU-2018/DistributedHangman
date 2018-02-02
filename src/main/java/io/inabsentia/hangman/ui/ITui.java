@@ -4,10 +4,11 @@ public interface ITui {
     void startLoop();
     String getCommand();
     void executeCommand(String command);
-    void signIn() throws Exception;
-    void signOut() throws Exception;
+    void signIn();
+    void signOut();
     void exit();
-    void printStartScreen();
+    void printMenu();
     void printAbout();
+    void printUnrecognizedCommand();
     void printMessage(String message, boolean newLine, boolean isRed);
 }
