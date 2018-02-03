@@ -1,6 +1,7 @@
 package io.inabsentia.distributedhangman.ui;
 
 import brugerautorisation.data.Bruger;
+import io.inabsentia.distributedhangman.util.Utils;
 
 import java.io.IOException;
 
@@ -310,6 +311,9 @@ public final class Tui {
 
     private String parseString(String text, int lineLength, boolean withStartPipe) {
 
+        if (text.length() > lineLength)
+            return text.substring(0, lineLength);
+
         int textLength = text.length();
         lineLength -= textLength;
 
@@ -326,6 +330,124 @@ public final class Tui {
         msg += "|";
 
         return msg;
+    }
+
+    public final void printHangman(int elapsedSeconds, int lifeLeft, int score, String hiddenWord, String usedCharacters) {
+        String[] hangmanBodyChars = {"0", "/", "|", "\\", "/", "\\"};
+        String[] hangmanBody = new String[6];
+
+        int maximumStringLength = 5;
+        String elapsedSecondsStr = addLeadingSpacesToString(Integer.toString(elapsedSeconds), maximumStringLength);
+        String lifeLeftStr = addLeadingSpacesToString(Integer.toString(lifeLeft), maximumStringLength);
+        String scoreStr = addLeadingSpacesToString(Integer.toString(score), maximumStringLength);
+
+        for (int i = 0; i < hangmanBody.length; i++)
+            hangmanBody[i] = " ";
+
+        for (int j = 0; j < lifeLeft; j++) {
+            if (j > Utils.MAXIMUM_LIFE - 1)
+                break;
+            hangmanBody[j] = hangmanBodyChars[j];
+        }
+
+        String hiddenWordStr = parseString(hiddenWord, 27, false);
+        String usedCharactersStr = parseString(usedCharacters, 27, false);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("/---------------------------\\\n");
+        sb.append("|    DistributedHangman     |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|                 ______    |\n");
+        sb.append("| Time:  ").append(elapsedSecondsStr).append("   |      |   |\n");
+        sb.append("| Life:  ").append(lifeLeftStr).append("   |      ").append(hangmanBody[0]).append("   |\n");
+        sb.append("| Score: " + scoreStr + "   |     " + hangmanBody[1] + hangmanBody[2] + hangmanBody[3] + "  |\n");
+        sb.append("|                |     ").append(hangmanBody[4]).append(" ").append(hangmanBody[5]).append("  |\n");
+        sb.append("|                |          |\n");
+        sb.append("|                           |\n");
+        sb.append("|").append(hiddenWordStr).append("\n");
+        sb.append("|").append(usedCharactersStr).append("\n");
+        sb.append("|                           |\n");
+        sb.append("\\---------------------------/\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printFirstGuessInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("/---------------------------\\\n");
+        sb.append("|            Play           |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|     Go ahead and take     |\n");
+        sb.append("|     your first guess!     |\n");
+        sb.append("\\---------------------------/\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printCorrectGuess() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("/---------------------------\\\n");
+        sb.append("|           Guess           |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|    You guessed correct!   |\n");
+        sb.append("\\---------------------------/\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printWrongGuess() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("/---------------------------\\\n");
+        sb.append("|           Guess           |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|     You guessed wrong!    |\n");
+        sb.append("\\---------------------------/\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printWin(String secretWord) {
+        StringBuilder sb = new StringBuilder();
+
+        String secretWordStr = parseString(secretWord, 27, false);
+
+        sb.append("/---------------------------\\\n");
+        sb.append("|         You won!          |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|   You guessed the word!   |\n");
+        sb.append("|       The word was:       |\n");
+        sb.append("|").append(secretWordStr).append("\n");
+        sb.append("\\---------------------------/\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printLoss(String secretWord) {
+        StringBuilder sb = new StringBuilder();
+
+        String secretWordStr = parseString(secretWord, 27, false);
+
+        sb.append("/---------------------------\\\n");
+        sb.append("|         You lost...       |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|       The word was:       |\n");
+        sb.append("|").append(secretWordStr).append("\n");
+        sb.append("\\---------------------------/\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    private String addLeadingSpacesToString(String text, int maximumSize) {
+        if (text.length() > maximumSize)
+            return text.substring(0, maximumSize);
+
+        if (text.length() == maximumSize)
+            return text;
+
+        StringBuilder sb = new StringBuilder();
+
+        int amountOfSpaces = maximumSize - text.length();
+
+        for (int i = 0; i < amountOfSpaces; i++)
+            sb.append(" ");
+
+        sb.append(text);
+
+        return sb.toString();
     }
 
     /*

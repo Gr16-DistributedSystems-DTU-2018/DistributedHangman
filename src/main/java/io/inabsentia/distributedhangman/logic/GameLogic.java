@@ -12,6 +12,7 @@ public class GameLogic {
     private String hiddenWord;
 
     private int life = MAXIMUM_LIFE;
+    private int score = 0;
 
     private List<String> wordList;
     private List<Character> usedLettersList;
@@ -28,6 +29,7 @@ public class GameLogic {
 
     private GameLogic() {
         wordList = new ArrayList<>();
+        usedLettersList = new ArrayList<>();
         initLogic();
     }
 
@@ -38,7 +40,7 @@ public class GameLogic {
     private void initLogic() {
         initWordList();
         word = getRandomWord();
-        hiddenWord = getHiddenWord();
+        hiddenWord = createHiddenWord();
 
     }
 
@@ -60,7 +62,7 @@ public class GameLogic {
         return wordList.get(new Random().nextInt(wordList.size()));
     }
 
-    private String getHiddenWord() {
+    private String createHiddenWord() {
         if (word == null)
             word = getRandomWord();
 
@@ -118,5 +120,37 @@ public class GameLogic {
         }
         return usedLettersString;
     }
+
+    public void startTimer() {
+
+    }
+
+    public int getTime() {
+        return 0;
+    }
+
+    public void stopAndResetTimer() {
+
+    }
+
+    public int getLifeLeft() {
+        return life;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public String getUsedLettersString() {
+        StringBuilder sb = new StringBuilder();
+        for (Character s : usedLettersList)
+            sb.append(s);
+        return sb.toString();
+    }
+
+    public String getHiddenWord() {
+        return hiddenWord;
+    }
+
 
 }

@@ -2,6 +2,7 @@ package io.inabsentia.distributedhangman.controller;
 
 import brugerautorisation.data.Bruger;
 import io.inabsentia.distributedhangman.controller.exceptions.UserControllerException;
+import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
 import io.inabsentia.distributedhangman.controller.interfaces.IScreenController;
 import io.inabsentia.distributedhangman.controller.interfaces.IUserController;
 import io.inabsentia.distributedhangman.ui.Tui;
@@ -18,6 +19,7 @@ public final class ScreenController implements IScreenController {
     /* Singleton Objects */
     private final Tui tui = Tui.getInstance();
     private final IUserController userController = UserController.getInstance();
+    private final IGameController gameController = GameController.getInstance();
 
     /* Static Singleton instance */
     private static IScreenController instance;
@@ -67,7 +69,7 @@ public final class ScreenController implements IScreenController {
     @Override
     public String getUserCommand() {
         tui.printArrow(Utils.CMD_ARROW);
-        String command = scanner.nextLine();
+        String command = scanner.nextLine().toLowerCase();
         return command;
     }
 
@@ -79,22 +81,34 @@ public final class ScreenController implements IScreenController {
                 signIn();
                 break;
             case "w":
-                signOut();
+                if (userController.isSignedIn())
+                    signOut();
+                else
+                    tui.printUnrecognizedCommand();
                 break;
             case "e":
+                if (userController.isSignedIn())
+                    gameController.startGame();
+                else
+                    tui.printUnrecognizedCommand();
                 break;
             case "r":
-                tui.printUserInformation(getUserHelper());
+                if (userController.isSignedIn())
+                    tui.printUserInformation(getUserHelper());
+                else
+                    tui.printUnrecognizedCommand();
                 break;
             case "a":
-                try {
-                    String highscore = userController.getUserField(getUserHelper().brugernavn, getUserHelper().adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
-                    tui.printUserHighScore(getUserHelper(), highscore);
-                } catch (UserControllerException e) {
-                    e.printStackTrace();
+                if (userController.isSignedIn()) {
+                    try {
+                        String highscore = userController.getUserField(getUserHelper().brugernavn, getUserHelper().adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
+                        tui.printUserHighScore(getUserHelper(), highscore);
+                    } catch (UserControllerException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    tui.printUnrecognizedCommand();
                 }
-                break;
-            case "s":
                 break;
             case "z":
                 clearScreenHelper();

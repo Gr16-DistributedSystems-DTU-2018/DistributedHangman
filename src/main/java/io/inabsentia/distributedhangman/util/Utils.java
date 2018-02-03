@@ -7,6 +7,8 @@ public final class Utils {
     public final static String RMI_STUB_URL = "rmi://javabog.dk/brugeradmin";
     public final static String HIGH_SCORE_FIELD_KEY = "s151641_highscore";
 
+    public final static int MAXIMUM_LIFE = 6;
+
     /* Static Singleton instance */
     private static Utils instance;
 
