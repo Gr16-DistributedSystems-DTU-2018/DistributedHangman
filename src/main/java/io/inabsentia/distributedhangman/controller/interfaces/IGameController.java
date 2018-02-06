@@ -1,5 +1,7 @@
 package io.inabsentia.distributedhangman.controller.interfaces;
 
+import java.rmi.RemoteException;
+
 public interface IGameController {
-    void startGame();
+    void start() throws RemoteException;
 }

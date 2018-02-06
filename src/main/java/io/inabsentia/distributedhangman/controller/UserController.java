@@ -29,9 +29,9 @@ public final class UserController implements IUserController {
     private UserController() throws UserControllerException {
         if (rmiController == null) {
             try {
-                rmiController = (Brugeradmin) Naming.lookup(Utils.RMI_STUB_URL);
+                rmiController = (Brugeradmin) Naming.lookup(Utils.RMI_STUB_URL_USERS);
             } catch (NotBoundException | RemoteException | MalformedURLException e) {
-                throw new UserControllerException("Failed initializing RMI stub: " + Utils.RMI_STUB_URL);
+                throw new UserControllerException("Failed initializing RMI stub: " + Utils.RMI_STUB_URL_USERS);
             }
         }
     }

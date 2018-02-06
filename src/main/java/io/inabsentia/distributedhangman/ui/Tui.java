@@ -4,6 +4,7 @@ import brugerautorisation.data.Bruger;
 import io.inabsentia.distributedhangman.util.Utils;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 /*
  * NOTES: Most methods are public, so that the TUI user is only
@@ -16,6 +17,8 @@ public final class Tui {
 
     /* Static Singleton instance */
     private static Tui instance;
+
+    private static Scanner scanner;
 
     /*
      * Static initialization block for the Singleton instance.
@@ -32,7 +35,7 @@ public final class Tui {
      * Private constructor for Singleton.
      */
     private Tui() {
-
+        scanner = new Scanner(System.in);
     }
 
     /*
@@ -332,11 +335,12 @@ public final class Tui {
         return msg;
     }
 
-    public final void printHangman(int elapsedSeconds, int lifeLeft, int score, String hiddenWord, String usedCharacters) {
+    public final void printHangman(String playerName, int elapsedSeconds, int lifeLeft, int score, String hiddenWord, String usedCharacters) {
         String[] hangmanBodyChars = {"0", "/", "|", "\\", "/", "\\"};
         String[] hangmanBody = new String[6];
 
-        int maximumStringLength = 5;
+        int maximumStringLength = 6;
+        String playerNameStr = addLeadingSpacesToString(playerName, maximumStringLength);
         String elapsedSecondsStr = addLeadingSpacesToString(Integer.toString(elapsedSeconds), maximumStringLength);
         String lifeLeftStr = addLeadingSpacesToString(Integer.toString(lifeLeft), maximumStringLength);
         String scoreStr = addLeadingSpacesToString(Integer.toString(score), maximumStringLength);
@@ -354,8 +358,9 @@ public final class Tui {
         String usedCharactersStr = parseString(usedCharacters, 27, false);
 
         StringBuilder sb = new StringBuilder();
+        /*
         sb.append("/---------------------------\\\n");
-        sb.append("|    DistributedHangman     |\n");
+        sb.append("|    Distributed Hangman    |\n");
         sb.append("|---------------------------|\n");
         sb.append("|                 ______    |\n");
         sb.append("| Time:  ").append(elapsedSecondsStr).append("   |      |   |\n");
@@ -368,6 +373,23 @@ public final class Tui {
         sb.append("|").append(usedCharactersStr).append("\n");
         sb.append("|                           |\n");
         sb.append("\\---------------------------/\n");
+        */
+
+        sb.append("/---------------------------\\\n");
+        sb.append("|    Distributed Hangman    |\n");
+        sb.append("|---------------------------|\n");
+        sb.append("|                 ______    |\n");
+        sb.append("| Name:  ").append(playerNameStr).append("  |      |   |\n");
+        sb.append("| Time:  ").append(elapsedSecondsStr).append("  |      ").append(hangmanBody[0]).append("   |\n");
+        sb.append("| Life:  ").append(lifeLeftStr).append("  |     ").append(hangmanBody[1]).append(hangmanBody[2]).append(hangmanBody[3]).append("  |\n");
+        sb.append("| Score: ").append(scoreStr).append("  |     ").append(hangmanBody[4]).append(" ").append(hangmanBody[5]).append("  |\n");
+        sb.append("|                |          |\n");
+        sb.append("|                           |\n");
+        sb.append("|").append(hiddenWordStr).append("\n");
+        sb.append("|").append(usedCharactersStr).append("\n");
+        sb.append("|                           |\n");
+        sb.append("\\---------------------------/\n");
+
         printMessage(sb.toString(), true, false);
     }
 
@@ -465,6 +487,22 @@ public final class Tui {
             else
                 System.out.print(message);
         }
+    }
+
+    public String getUserCommand(String arrow) {
+        printArrow(arrow);
+        String command = scanner.nextLine().toLowerCase();
+        return command;
+    }
+
+    public String getUserCommand(String arrow, String postfix) {
+        printArrow(arrow, postfix);
+        String command = scanner.nextLine().toLowerCase();
+
+        if (command.equals("") || command.equals(" "))
+            return " ";
+
+        return command;
     }
 
 }

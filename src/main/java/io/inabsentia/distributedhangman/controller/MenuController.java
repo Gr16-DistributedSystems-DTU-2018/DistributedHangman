@@ -1,19 +1,20 @@
 package io.inabsentia.distributedhangman.controller;
 
 import brugerautorisation.data.Bruger;
+import com.sun.xml.internal.ws.assembler.jaxws.MustUnderstandTubeFactory;
 import io.inabsentia.distributedhangman.controller.exceptions.UserControllerException;
 import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
-import io.inabsentia.distributedhangman.controller.interfaces.IScreenController;
+import io.inabsentia.distributedhangman.controller.interfaces.IMenuController;
 import io.inabsentia.distributedhangman.controller.interfaces.IUserController;
 import io.inabsentia.distributedhangman.ui.Tui;
 import io.inabsentia.distributedhangman.util.Utils;
 
+import java.rmi.RemoteException;
 import java.util.Scanner;
 
-public final class ScreenController implements IScreenController {
+public final class MenuController implements IMenuController {
 
     /* Fields */
-    private final Scanner scanner;
     private boolean isCLSOn = true;
 
     /* Singleton Objects */
@@ -22,41 +23,40 @@ public final class ScreenController implements IScreenController {
     private final IGameController gameController = GameController.getInstance();
 
     /* Static Singleton instance */
-    private static IScreenController instance;
+    private static IMenuController instance;
 
     /*
      * Static initialization block for the Singleton instance.
      */
     static {
         try {
-            instance = new ScreenController();
+            instance = new MenuController();
         } catch (Exception e) {
-            throw new RuntimeException("Fatal error creating Singleton ScreenController instance!");
+            throw new RuntimeException("Fatal error creating Singleton MenuController instance!");
         }
     }
 
     /*
      * Private constructor for Singleton.
      */
-    private ScreenController() {
-        scanner = new Scanner(System.in);
+    private MenuController() {
     }
 
     /*
      * Singleton instance getter.
      */
-    public static synchronized IScreenController getInstance() {
+    public static synchronized IMenuController getInstance() {
         return instance;
     }
 
     @Override
-    public void startLoop() {
+    public void start() {
         clearScreenHelper();
 
         tui.printMenu(getUserHelper(), isCLSOn);
 
         while (true) {
-            String command = getUserCommand();
+            String command = tui.getUserCommand(Utils.CMD_ARROW);
 
             clearScreenHelper();
             tui.printMenu(getUserHelper(), isCLSOn);
@@ -64,13 +64,6 @@ public final class ScreenController implements IScreenController {
             executeUserCommand(command);
         }
 
-    }
-
-    @Override
-    public String getUserCommand() {
-        tui.printArrow(Utils.CMD_ARROW);
-        String command = scanner.nextLine().toLowerCase();
-        return command;
     }
 
     @Override
@@ -87,8 +80,13 @@ public final class ScreenController implements IScreenController {
                     tui.printUnrecognizedCommand();
                 break;
             case "e":
-                if (userController.isSignedIn())
-                    gameController.startGame();
+                if (userController.isSignedIn()) {
+                    try {
+                        gameController.start();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
                 else
                     tui.printUnrecognizedCommand();
                 break;
@@ -131,16 +129,13 @@ public final class ScreenController implements IScreenController {
 
     @Override
     public void signIn() {
-        tui.printArrow(Utils.CMD_ARROW, "Username");
-        String userName = scanner.nextLine();
-
-        tui.printArrow(Utils.CMD_ARROW, "Password");
-        String password = scanner.nextLine();
+        String username = tui.getUserCommand(Utils.CMD_ARROW, "Username");
+        String password = tui.getUserCommand(Utils.CMD_ARROW, "Password");
 
         clearScreenHelper();
 
         try {
-            userController.signIn(userName, password);
+            userController.signIn(username, password);
             tui.printMenu(getUserHelper(), isCLSOn);
             tui.printSignInSuccess();
         } catch (UserControllerException e) {

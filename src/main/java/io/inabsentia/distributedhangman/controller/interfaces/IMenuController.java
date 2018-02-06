@@ -1,8 +1,7 @@
 package io.inabsentia.distributedhangman.controller.interfaces;
 
-public interface IScreenController {
-    void startLoop();
-    String getUserCommand();
+public interface IMenuController {
+    void start();
     void executeUserCommand(String command);
     void signIn();
     void signOut();

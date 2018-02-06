@@ -1,50 +1,35 @@
 package io.inabsentia.distributedhangman.logic;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class GameLogic {
+public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
 
-    public static final int MAXIMUM_LIFE = 7;
+    public static final int MAXIMUM_LIFE = 6;
 
     private String word;
     private String hiddenWord;
 
+    private int time = 0;
     private int life = MAXIMUM_LIFE;
     private int score = 0;
 
     private List<String> wordList;
-    private List<Character> usedLettersList;
+    private List<Character> usedCharactersList;
 
-    private static GameLogic instance;
-
-    static {
-        try {
-            instance = new GameLogic();
-        } catch (Exception e) {
-            throw new RuntimeException("Fatal error creating Singleton instance!");
-        }
-    }
-
-    private GameLogic() {
+    public GameLogic() throws RemoteException {
         wordList = new ArrayList<>();
-        usedLettersList = new ArrayList<>();
-        initLogic();
-    }
-
-    public static synchronized GameLogic getInstance() {
-        return instance;
-    }
-
-    private void initLogic() {
-        initWordList();
-        word = getRandomWord();
-        hiddenWord = createHiddenWord();
-
+        usedCharactersList = new ArrayList<>();
+        reset();
     }
 
     private void initWordList() {
+        if (!wordList.isEmpty())
+            return;
+
         wordList.add("river");
         wordList.add("baseball");
         wordList.add("intelligence");
@@ -66,26 +51,28 @@ public class GameLogic {
         if (word == null)
             word = getRandomWord();
 
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < word.length(); i++)
-            hiddenWord += "*";
+            sb.append("*");
+        hiddenWord = sb.toString();
 
         return hiddenWord;
     }
 
-    private void useLetter(char letter) {
-        if (usedLettersList.size() == 0) {
-            usedLettersList.add(letter);
+    private void useCharacter(char letter) {
+        if (usedCharactersList.size() == 0) {
+            usedCharactersList.add(letter);
             return;
         }
 
-        for (int i = 0; i < usedLettersList.size(); i++)
-            if (usedLettersList.get(i) == letter)
+        for (int i = 0; i < usedCharactersList.size(); i++)
+            if (usedCharactersList.get(i) == letter)
                 return;
 
-        usedLettersList.add(letter);
+        usedCharactersList.add(letter);
     }
 
-    private void removeLetter(char letter) {
+    private void removeCharacter(char letter) {
         for (int i = 0; i < word.length(); i++) {
             if (word.charAt(i) == letter) {
                 char[] charArray = hiddenWord.toCharArray();
@@ -95,6 +82,7 @@ public class GameLogic {
         }
     }
 
+    @Override
     public boolean isWon() {
         if (word == null || hiddenWord == null)
             return false;
@@ -106,51 +94,109 @@ public class GameLogic {
         return true;
     }
 
-    public boolean isDead() {
+    @Override
+    public boolean isLost() {
         return life == 0;
     }
 
-    public String getUsedLetters() {
-        String usedLettersString = "";
-        for (int i = 0; i < usedLettersList.size(); i++) {
-            if (i + 1 < usedLettersList.size())
-                usedLettersString += usedLettersList.get(i) + ", ";
+    @Override
+    public String getUsedCharacters() {
+        String usedCharactersString = "";
+        for (int i = 0; i < usedCharactersList.size(); i++) {
+            if (i + 1 < usedCharactersList.size())
+                usedCharactersString += usedCharactersList.get(i) + ", ";
             else
-                usedLettersString += usedLettersList.get(i);
+                usedCharactersString += usedCharactersList.get(i);
         }
-        return usedLettersString;
+        return usedCharactersString;
     }
 
+    @Override
     public void startTimer() {
 
     }
 
-    public int getTime() {
-        return 0;
+    @Override
+    public int getTimeElapsed() {
+        return time;
     }
 
+    @Override
     public void stopAndResetTimer() {
-
+        time = 0;
     }
 
+    @Override
+    public void addScore(int score) {
+        this.score += score;
+    }
+
+    @Override
+    public void reset() {
+        initWordList();
+        word = getRandomWord();
+        hiddenWord = createHiddenWord();
+        stopAndResetTimer();
+        life = MAXIMUM_LIFE;
+        score = 0;
+        usedCharactersList = new ArrayList<>();
+    }
+
+    @Override
     public int getLifeLeft() {
         return life;
     }
 
+    @Override
     public int getScore() {
         return score;
     }
 
-    public String getUsedLettersString() {
+    @Override
+    public int getWordScore() {
+        return hiddenWord.length();
+    }
+
+    @Override
+    public String getUsedCharactersString() {
         StringBuilder sb = new StringBuilder();
-        for (Character s : usedLettersList)
+        for (Character s : usedCharactersList)
             sb.append(s);
         return sb.toString();
     }
 
+    @Override
     public String getHiddenWord() {
         return hiddenWord;
     }
 
+    @Override
+    public String getWord() {
+        return word;
+    }
+
+    @Override
+    public void decreaseLife() {
+        life -= 1;
+    }
+
+    @Override
+    public boolean isCharGuessed(char character) {
+        for (Character c : usedCharactersList)
+            if (c == character) return true;
+        return false;
+    }
+
+    @Override
+    public boolean guess(char character) {
+        useCharacter(character);
+
+        if (word.contains(Character.toString(character))) {
+            removeCharacter(character);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
