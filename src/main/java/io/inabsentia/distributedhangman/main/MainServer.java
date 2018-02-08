@@ -10,13 +10,13 @@ import java.rmi.registry.LocateRegistry;
 public final class MainServer {
 
     public static void main(String[] args) throws Exception {
-        LocateRegistry.createRegistry(1099);
+        LocateRegistry.createRegistry(Integer.parseInt(String.valueOf(Utils.REMOTE_PORT)));
+        System.setProperty("java.rmi.server.hostname", "ubuntu4.javabog.dk");
 
         IGameLogic logic = new GameLogic();
-        System.setProperty("java.rmi.server.hostname", "javabog.dk");
-        Naming.rebind(Utils.RMI_STUB_URL_LOCAL_LOGIC, logic);
+        Naming.rebind(Utils.RMI_STUB_URL_REMOTE_LOGIC_JAVABOG, logic);
 
-        System.out.println("GameLogic registered at: " + Utils.RMI_STUB_URL_LOCAL_LOGIC);
+        System.out.println("GameLogic registered at: " + Utils.RMI_STUB_URL_REMOTE_LOGIC_JAVABOG);
     }
 
 }

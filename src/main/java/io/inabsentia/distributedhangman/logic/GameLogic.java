@@ -1,6 +1,8 @@
 package io.inabsentia.distributedhangman.logic;
 
 import java.rmi.RemoteException;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,11 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
         wordList = new ArrayList<>();
         usedCharactersList = new ArrayList<>();
         reset();
+        try {
+            System.out.println("GameLogic registered: " + RemoteServer.getClientHost());
+        } catch (ServerNotActiveException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initWordList() {

@@ -30,7 +30,7 @@ public final class GameController implements IGameController {
         try {
             instance = new GameController();
         } catch (Exception e) {
-            throw new RuntimeException("Fatal error creating Singleton MenuController instance!");
+            throw new RuntimeException("Fatal error creating Singleton GameController instance!");
         }
     }
 
@@ -39,7 +39,7 @@ public final class GameController implements IGameController {
      */
     private GameController() throws Exception {
         scanner = new Scanner(System.in);
-        logic = (IGameLogic) Naming.lookup(Utils.RMI_STUB_URL_LOCAL_LOGIC);
+        logic = (IGameLogic) Naming.lookup(Utils.RMI_STUB_URL_REMOTE_LOGIC_JAVABOG);
     }
 
     /*
