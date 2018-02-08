@@ -50,12 +50,12 @@ public final class Tui {
      */
     public final void printSignInPrompt() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|          Sign In          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("| Please provide username   |\n");
-        sb.append("| and password below.       |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│          Sign In          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ Please provide username   │\n");
+        sb.append("│ and password below.       │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -64,11 +64,11 @@ public final class Tui {
      */
     public final void printSignInSuccess() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|          Sign In          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|  Successfully signed in!  |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│          Sign In          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│  Successfully signed in!  │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -77,11 +77,11 @@ public final class Tui {
      */
     public final void printSignInFailure() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|          Sign In          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|  Authentication failed!   |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│          Sign In          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│  Authentication failed!   │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -90,11 +90,11 @@ public final class Tui {
      */
     public final void printSignOutSuccess() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|         Sign Out          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("| Successfully signed out!  |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│         Sign Out          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ Successfully signed out!  │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
 
     }
@@ -104,11 +104,11 @@ public final class Tui {
      */
     public final void printSignOutFailure() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|         Sign Out          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|       Not signed in!      |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│         Sign Out          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│       Not signed in!      │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -117,11 +117,11 @@ public final class Tui {
      */
     public final void printExit() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|            Exit           |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|            Bye!           |\n");
-        sb.append("\\---------------------------/");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│            Exit           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│            Bye!           │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -136,10 +136,10 @@ public final class Tui {
         if (user != null)
             signedInMessage = user.fornavn + " " + user.efternavn;
 
-        sb.append("\n/---------------------------\\\n");
-        sb.append("|         Welcome to        |\n");
-        sb.append("|    Distributed Hangman!   |\n");
-        sb.append("|---------------------------|\n"); // 27 chars long without the two |
+        sb.append("\n┌───────────────────────────┐\n");
+        sb.append("│         Welcome to        │\n");
+        sb.append("│    Distributed Hangman!   │\n");
+        sb.append("├───────────────────────────┤\n"); // 27 chars long without the two |
 
         String text = parseString(signedInMessage, 27, true);
         sb.append(text).append("\n");
@@ -149,34 +149,35 @@ public final class Tui {
         if (isCLSOn)
             isCLSOnStatus = "[ON]";
 
-        sb.append("|---------------------------|\n");
-        sb.append("| <Key>          Command    |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("| <q>            Sign In    |\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ <Key>          Command    │\n");
+        sb.append("├───────────────────────────┤\n");
+
+        if (user == null)
+            sb.append("│ <q>            Sign In    │\n");
+
+        if (user != null)
+            sb.append("│ <w>            Sign Out   │\n");
+
+        sb.append("│                           │\n");
 
         if (user != null) {
-            sb.append("| <w>            Sign Out   |\n");
+            sb.append("│ <e>            Play       │\n");
+            sb.append("│                           │\n");
+            sb.append("│ <r>            User (i)   │\n");
+            sb.append("│ <a>            User Score │\n");
+            sb.append("│                           │\n");
         }
 
-        sb.append("|                           |\n");
-
-        if (user != null) {
-            sb.append("| <e>            Play       |\n");
-            sb.append("|                           |\n");
-            sb.append("| <r>            User (i)   |\n");
-            sb.append("| <a>            User Score |\n");
-            sb.append("|                           |\n");
-        }
-
-        sb.append("| <z>            CLS ").append(isCLSOnStatus);
+        sb.append("│ <z>            CLS ").append(isCLSOnStatus);
         if (!isCLSOn)
-            sb.append("  |\n");
+            sb.append("  │\n");
         else
-            sb.append("   |\n");
+            sb.append("   │\n");
 
-        sb.append("| <x>            About      |\n");
-        sb.append("| <c>            Exit       |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("│ <x>            About      │\n");
+        sb.append("│ <c>            Exit       │\n");
+        sb.append("└───────────────────────────┘\n");
 
         printMessage(sb.toString(), true, false);
     }
@@ -186,13 +187,16 @@ public final class Tui {
      */
     public final void printAbout() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|           About           |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|          Made By          |\n");
-        sb.append("|   s151641 Daniel Larsen   |\n");
-        sb.append("|            DTU            |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│            About          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│        Made at DTU        │\n");
+        sb.append("│    Distributed Systems    │\n");
+        sb.append("│                           │\n");
+        sb.append("│ Works best on Windows CMD.│\n");
+        sb.append("│ Enable CLS for a better   │\n");
+        sb.append("│ experience on CMD.        │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -213,11 +217,11 @@ public final class Tui {
      */
     public final void printUnrecognizedCommand() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|          Command          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|  Command not recognized!  |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│          Command          │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│  Command not recognized!  │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -229,9 +233,9 @@ public final class Tui {
             return;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------------------\\\n");
-        sb.append("|            User Information           |\n");
-        sb.append("|---------------------------------------|\n");
+        sb.append("┌───────────────────────────────────────┐\n");
+        sb.append("│            User Information           │\n");
+        sb.append("├───────────────────────────────────────┤\n");
 
         int lineLength = 23;
 
@@ -259,42 +263,62 @@ public final class Tui {
         /* Parse Last Active */
         String lastActive = parseString(Long.toString(user.sidstAktiv), lineLength, false);
 
-        sb.append("| CampusNet ID : ").append(campusnetId).append("\n");
-        sb.append("| Username     : ").append(userName).append("\n");
-        sb.append("| Password     : ").append(password).append("\n");
-        sb.append("|                                       |\n");
-        sb.append("| First Name   : ").append(firstName).append("\n");
-        sb.append("| Last Name    : ").append(lastName).append("\n");
-        sb.append("| E-mail       : ").append(email).append("\n");
-        sb.append("|                                       |\n");
-        sb.append("| Study Field  : ").append(studyField).append("\n");
-        sb.append("| Last Active  : ").append(lastActive).append("\n");
-        sb.append("\\---------------------------------------/\n");
+        sb.append("│ CampusNet ID : ").append(campusnetId).append("\n");
+        sb.append("│ Username     : ").append(userName).append("\n");
+        sb.append("│ Password     : ").append(password).append("\n");
+        sb.append("│                                       │\n");
+        sb.append("│ First Name   : ").append(firstName).append("\n");
+        sb.append("│ Last Name    : ").append(lastName).append("\n");
+        sb.append("│ E-mail       : ").append(email).append("\n");
+        sb.append("│                                       │\n");
+        sb.append("│ Study Field  : ").append(studyField).append("\n");
+        sb.append("│ Last Active  : ").append(lastActive).append("\n");
+        sb.append("└───────────────────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
     /*
      * Method to print user high score.
      */
-    public final void printUserHighScore(Bruger user, String highscore) {
+    public final void printUserHighScore(Bruger user, String highScore) {
         if (user == null)
             return;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|         High Score        |\n");
-        sb.append("|---------------------------|\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│         High Score        │\n");
+        sb.append("├───────────────────────────┤\n");
 
         String userText = user.fornavn + " " + user.efternavn;
         userText = parseString(userText, 27, true) + "\n";
         sb.append(userText);
-        sb.append("|---------------------------|\n");
+        sb.append("├───────────────────────────┤\n");
 
         int lineLength = 14;
-        String highscoreString = parseString(highscore, lineLength, false);
+        String highscoreString = parseString(highScore, lineLength, false);
 
-        sb.append("| High Score: ").append(highscoreString).append("\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("│ High Score: ").append(highscoreString).append("\n");
+        sb.append("└───────────────────────────┘\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printNewScore(String highScore, boolean isHighScore) {
+        String newHighScore = "Score";
+
+        if (isHighScore)
+            newHighScore = "New High Score!";
+
+        newHighScore = parseString(newHighScore, 27, true);
+
+        String highScoreStr = "Score: " + highScore;
+        highScoreStr = parseString(highScoreStr, 27, true);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("┌───────────────────────────┐\n");
+        sb.append(newHighScore).append("\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append(highScoreStr).append("\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -323,14 +347,14 @@ public final class Tui {
         String msg = "";
 
         if (withStartPipe)
-            msg = "|";
+            msg = "│";
 
         for (int i = 0; i < lineLength; i++) {
             if (i == lineLength / 2)
                 msg += text;
             msg += " ";
         }
-        msg += "|";
+        msg += "│";
 
         return msg;
     }
@@ -355,72 +379,57 @@ public final class Tui {
         }
 
         String hiddenWordStr = parseString(hiddenWord, 27, false);
+        usedCharacters = "- " + usedCharacters + " -";
         String usedCharactersStr = parseString(usedCharacters, 27, false);
 
         StringBuilder sb = new StringBuilder();
-        /*
-        sb.append("/---------------------------\\\n");
-        sb.append("|    Distributed Hangman    |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|                 ______    |\n");
-        sb.append("| Time:  ").append(elapsedSecondsStr).append("   |      |   |\n");
-        sb.append("| Life:  ").append(lifeLeftStr).append("   |      ").append(hangmanBody[0]).append("   |\n");
-        sb.append("| Score: " + scoreStr + "   |     " + hangmanBody[1] + hangmanBody[2] + hangmanBody[3] + "  |\n");
-        sb.append("|                |     ").append(hangmanBody[4]).append(" ").append(hangmanBody[5]).append("  |\n");
-        sb.append("|                |          |\n");
-        sb.append("|                           |\n");
-        sb.append("|").append(hiddenWordStr).append("\n");
-        sb.append("|").append(usedCharactersStr).append("\n");
-        sb.append("|                           |\n");
-        sb.append("\\---------------------------/\n");
-        */
 
-        sb.append("/---------------------------\\\n");
-        sb.append("|    Distributed Hangman    |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|                 ______    |\n");
-        sb.append("| Name:  ").append(playerNameStr).append("  |      |   |\n");
-        sb.append("| Time:  ").append(elapsedSecondsStr).append("  |      ").append(hangmanBody[0]).append("   |\n");
-        sb.append("| Life:  ").append(lifeLeftStr).append("  |     ").append(hangmanBody[1]).append(hangmanBody[2]).append(hangmanBody[3]).append("  |\n");
-        sb.append("| Score: ").append(scoreStr).append("  |     ").append(hangmanBody[4]).append(" ").append(hangmanBody[5]).append("  |\n");
-        sb.append("|                |          |\n");
-        sb.append("|                           |\n");
-        sb.append("|").append(hiddenWordStr).append("\n");
-        sb.append("|").append(usedCharactersStr).append("\n");
-        sb.append("|                           |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│    Distributed Hangman    │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│                ┌──────┐   │\n");
+        sb.append("│ Name:  ").append(playerNameStr).append("  │      │   |\n");
+        sb.append("│ Time:  ").append(elapsedSecondsStr).append("  │      ").append(hangmanBody[0]).append("   │\n");
+        sb.append("│ Life:  ").append(lifeLeftStr).append("  │     ").append(hangmanBody[1]).append(hangmanBody[2]).append(hangmanBody[3]).append("  │\n");
+        sb.append("│ Score: ").append(scoreStr).append("  │     ").append(hangmanBody[4]).append(" ").append(hangmanBody[5]).append("  │\n");
+        sb.append("│                ┴          │\n");
+        sb.append("│                           │\n");
+        sb.append("│").append(hiddenWordStr).append("\n");
+        sb.append("│").append(usedCharactersStr).append("\n");
+        sb.append("│                           │\n");
+        sb.append("└───────────────────────────┘\n");
 
         printMessage(sb.toString(), true, false);
     }
 
     public final void printFirstGuessInfo() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|            Play           |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|     Go ahead and take     |\n");
-        sb.append("|     your first guess!     |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│            Play           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│     Go ahead and take     │\n");
+        sb.append("│     your first guess!     │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
     public final void printCorrectGuess() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|           Guess           |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|    You guessed correct!   |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│           Guess           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│    You guessed correct!   │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
     public final void printWrongGuess() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/---------------------------\\\n");
-        sb.append("|           Guess           |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|     You guessed wrong!    |\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│           Guess           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│     You guessed wrong!    │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -429,13 +438,14 @@ public final class Tui {
 
         String secretWordStr = parseString(secretWord, 27, false);
 
-        sb.append("/---------------------------\\\n");
-        sb.append("|         You won!          |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|   You guessed the word!   |\n");
-        sb.append("|       The word was:       |\n");
-        sb.append("|").append(secretWordStr).append("\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│       Yay, you won!       │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│   You guessed the word!   │\n");
+        sb.append("│                           │\n");
+        sb.append("│       The word was:       │\n");
+        sb.append("│").append(secretWordStr).append("\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -444,12 +454,61 @@ public final class Tui {
 
         String secretWordStr = parseString(secretWord, 27, false);
 
-        sb.append("/---------------------------\\\n");
-        sb.append("|         You lost...       |\n");
-        sb.append("|---------------------------|\n");
-        sb.append("|       The word was:       |\n");
-        sb.append("|").append(secretWordStr).append("\n");
-        sb.append("\\---------------------------/\n");
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│     Oh dear, you lost!    │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│       The word was:       │\n");
+        sb.append("│").append(secretWordStr).append("\n");
+        sb.append("│                           │\n");
+        sb.append("│  Better luck next time!   │\n");
+        sb.append("└───────────────────────────┘\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public String getUserCommand(String arrow) {
+        printArrow(arrow);
+        String command = scanner.nextLine().toLowerCase();
+        return command;
+    }
+
+    public String getUserCommand(String arrow, String postfix) {
+        printArrow(arrow, postfix);
+        String command = scanner.nextLine().toLowerCase();
+
+        if (command.equals("") || command.equals(" "))
+            return " ";
+
+        return command;
+    }
+
+    public final void printAlreadyGuessed(Character guess) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│           Oops!           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ You've already guessed ").append(guess).append("! │\n");
+        sb.append("└───────────────────────────┘\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public final void printError() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│          Oh oh!           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│   Something went wrong!   │\n");
+        sb.append("│      No need to panic.    │\n");
+        sb.append("└───────────────────────────┘\n");
+        printMessage(sb.toString(), true, false);
+    }
+
+    public void printPlayAgain() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│        Play again?        │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ Feel like playing again?  │\n");
+        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -487,22 +546,6 @@ public final class Tui {
             else
                 System.out.print(message);
         }
-    }
-
-    public String getUserCommand(String arrow) {
-        printArrow(arrow);
-        String command = scanner.nextLine().toLowerCase();
-        return command;
-    }
-
-    public String getUserCommand(String arrow, String postfix) {
-        printArrow(arrow, postfix);
-        String command = scanner.nextLine().toLowerCase();
-
-        if (command.equals("") || command.equals(" "))
-            return " ";
-
-        return command;
     }
 
 }

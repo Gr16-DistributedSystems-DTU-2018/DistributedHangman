@@ -13,9 +13,10 @@ public final class MainServer {
         LocateRegistry.createRegistry(1099);
 
         IGameLogic logic = new GameLogic();
-        Naming.rebind(Utils.RMI_STUB_URL_LOGIC, logic);
+        System.setProperty("java.rmi.server.hostname", "javabog.dk");
+        Naming.rebind(Utils.RMI_STUB_URL_LOCAL_LOGIC, logic);
 
-        System.out.println("GameLogic registered at: " + Utils.RMI_STUB_URL_LOGIC);
+        System.out.println("GameLogic registered at: " + Utils.RMI_STUB_URL_LOCAL_LOGIC);
     }
 
 }

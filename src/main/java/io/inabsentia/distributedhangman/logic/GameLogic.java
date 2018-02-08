@@ -38,6 +38,31 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
         wordList.add("dollar");
         wordList.add("food");
         wordList.add("meal");
+        wordList.add("actual");
+        wordList.add("artificial");
+        wordList.add("art");
+        wordList.add("egg");
+        wordList.add("music");
+        wordList.add("giant");
+        wordList.add("magic");
+        wordList.add("horizontal");
+        wordList.add("vertical");
+        wordList.add("dragon");
+        wordList.add("video");
+        wordList.add("games");
+        wordList.add("active");
+        wordList.add("make");
+        wordList.add("freezer");
+        wordList.add("color");
+        wordList.add("bottle");
+        wordList.add("continent");
+        wordList.add("britain");
+        wordList.add("chess");
+        wordList.add("system");
+        wordList.add("mathematics");
+        wordList.add("parallel");
+        wordList.add("degree");
+        wordList.add("school");
     }
 
     private String getRandomWord() {

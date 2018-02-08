@@ -1,7 +1,6 @@
 package io.inabsentia.distributedhangman.controller;
 
 import brugerautorisation.data.Bruger;
-import com.sun.xml.internal.ws.assembler.jaxws.MustUnderstandTubeFactory;
 import io.inabsentia.distributedhangman.controller.exceptions.UserControllerException;
 import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
 import io.inabsentia.distributedhangman.controller.interfaces.IMenuController;
@@ -10,12 +9,11 @@ import io.inabsentia.distributedhangman.ui.Tui;
 import io.inabsentia.distributedhangman.util.Utils;
 
 import java.rmi.RemoteException;
-import java.util.Scanner;
 
 public final class MenuController implements IMenuController {
 
     /* Fields */
-    private boolean isCLSOn = true;
+    private boolean isCLSOn = false;
 
     /* Singleton Objects */
     private final Tui tui = Tui.getInstance();
@@ -40,6 +38,7 @@ public final class MenuController implements IMenuController {
      * Private constructor for Singleton.
      */
     private MenuController() {
+
     }
 
     /*
@@ -70,8 +69,12 @@ public final class MenuController implements IMenuController {
     public void executeUserCommand(String command) {
         switch (command) {
             case "q":
-                tui.printSignInPrompt();
-                signIn();
+                if (!userController.isSignedIn()) {
+                    tui.printSignInPrompt();
+                    signIn();
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
                 break;
             case "w":
                 if (userController.isSignedIn())
@@ -86,9 +89,9 @@ public final class MenuController implements IMenuController {
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
-                }
-                else
+                } else {
                     tui.printUnrecognizedCommand();
+                }
                 break;
             case "r":
                 if (userController.isSignedIn())

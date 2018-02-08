@@ -3,9 +3,10 @@ package io.inabsentia.distributedhangman.util;
 public final class Utils {
 
     /* Fields */
-    public final static String CMD_ARROW = "-->";
+    public final static String CMD_ARROW = "»";
     public final static String RMI_STUB_URL_USERS = "rmi://javabog.dk/brugeradmin";
-    public final static String RMI_STUB_URL_LOGIC = "rmi://localhost/gamelogicservice";
+    public final static String RMI_STUB_URL_LOCAL_LOGIC = "rmi://localhost:1099/gamelogicservice";
+    public final static String RMI_STUB_URL_REMOTE_LOGIC = "rmi://javabog.dk:1099/gamelogicservice";
     public final static String HIGH_SCORE_FIELD_KEY = "s151641_highscore";
 
     public static final int SINGLE_CHAR_SCORE = 10;

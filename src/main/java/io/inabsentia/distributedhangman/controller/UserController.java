@@ -94,4 +94,15 @@ public final class UserController implements IUserController {
         }
     }
 
+    @Override
+    public boolean isHighScore(int score) throws UserControllerException {
+        if (!isSignedIn())
+            return false;
+
+        String scoreStr = getUserField(currentUser.brugernavn, currentUser.adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
+        int userScore = Integer.parseInt(scoreStr);
+
+        return score > userScore;
+    }
+
 }
