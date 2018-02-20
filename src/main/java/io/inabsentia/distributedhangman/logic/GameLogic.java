@@ -1,5 +1,12 @@
 package io.inabsentia.distributedhangman.logic;
 
+import brugerautorisation.data.Bruger;
+import brugerautorisation.transport.rmi.Brugeradmin;
+import io.inabsentia.distributedhangman.util.Utils;
+
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
@@ -10,28 +17,160 @@ import java.util.Random;
 
 public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
 
-    public static final int MAXIMUM_LIFE = 6;
+    private static final int MAXIMUM_LIFE = 6;
+
+    private int life = MAXIMUM_LIFE;
+    private int time = 0;
+    private int score = 0;
 
     private String word;
     private String hiddenWord;
 
-    private int time = 0;
-    private int life = MAXIMUM_LIFE;
-    private int score = 0;
-
     private List<String> wordList;
     private List<Character> usedCharactersList;
+
+    private Brugeradmin userController;
+    private Bruger currentUser;
 
     public GameLogic() throws RemoteException {
         wordList = new ArrayList<>();
         usedCharactersList = new ArrayList<>();
-        reset();
+        resetGame();
+
+        if (userController == null) {
+            try {
+                userController = (Brugeradmin) Naming.lookup(Utils.RMI_STUB_URL_USERS);
+            } catch (NotBoundException | RemoteException | MalformedURLException e) {
+                throw new RuntimeException("Failed initializing RMI stub: " + Utils.RMI_STUB_URL_USERS);
+            }
+        }
+
         try {
             System.out.println("GameLogic registered: " + RemoteServer.getClientHost());
         } catch (ServerNotActiveException e) {
             e.printStackTrace();
         }
     }
+
+    /************************************************
+     *         GAME LOGIC CODE RESIDES HERE!        *
+     ************************************************/
+    @Override
+    public boolean guessCharacter(char character) throws RemoteException {
+        useCharacter(character);
+
+        if (word.contains(Character.toString(character))) {
+            removeCharacter(character);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void addGameScore(int score) throws RemoteException {
+        this.score += score;
+    }
+
+    @Override
+    public void decreaseLife() throws RemoteException {
+        life--;
+    }
+
+    @Override
+    public void resetGame() throws RemoteException {
+        initWordList();
+        word = getRandomWord();
+        hiddenWord = createHiddenWord();
+        stopGameTimer();
+        resetGameTimer();
+        life = MAXIMUM_LIFE;
+        score = 0;
+        usedCharactersList = new ArrayList<>();
+    }
+
+    @Override
+    public void startGameTimer() throws RemoteException {
+
+    }
+
+    @Override
+    public void stopGameTimer() throws RemoteException {
+
+    }
+
+    @Override
+    public void resetGameTimer() throws RemoteException {
+        time = 0;
+    }
+
+    @Override
+    public int getGameTimeElapsed() throws RemoteException {
+        return time;
+    }
+
+    @Override
+    public String getUsedCharacters() throws RemoteException {
+        String usedCharactersString = "";
+        for (int i = 0; i < usedCharactersList.size(); i++) {
+            if (i + 1 < usedCharactersList.size())
+                usedCharactersString += usedCharactersList.get(i) + ", ";
+            else
+                usedCharactersString += usedCharactersList.get(i);
+        }
+        return usedCharactersString;
+    }
+
+    @Override
+    public String getHiddenWord() throws RemoteException {
+        return hiddenWord;
+    }
+
+    @Override
+    public String getGameWord() throws RemoteException {
+        return word;
+    }
+
+    @Override
+    public int getWordScore() throws RemoteException {
+        return hiddenWord.length();
+    }
+
+    @Override
+    public boolean isGameWon() throws RemoteException {
+        if (word == null || hiddenWord == null)
+            return false;
+
+        for (int i = 0; i < word.length(); i++)
+            if (word.charAt(i) != hiddenWord.charAt(i))
+                return false;
+
+        return true;
+    }
+
+    @Override
+    public boolean isGameLost() throws RemoteException {
+        return life == 0;
+    }
+
+    @Override
+    public boolean isHighScore(int score) throws RemoteException {
+        if (!isLoggedIn())
+            throw new RemoteException("Not logged in!");
+
+        String scoreStr = getUserField(currentUser.brugernavn, currentUser.adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
+        int userScore = Integer.parseInt(scoreStr);
+
+        return score > userScore;
+    }
+
+    @Override
+    public boolean isCharGuessed(char character) throws RemoteException {
+        for (Character c : usedCharactersList)
+            if (c == character) return true;
+        return false;
+    }
+
 
     private void initWordList() {
         if (!wordList.isEmpty())
@@ -75,7 +214,6 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
     private String getRandomWord() {
         if (wordList == null)
             initWordList();
-
         return wordList.get(new Random().nextInt(wordList.size()));
     }
 
@@ -85,7 +223,7 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < word.length(); i++)
-            sb.append("*");
+            sb.append("○");
         hiddenWord = sb.toString();
 
         return hiddenWord;
@@ -97,8 +235,8 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
             return;
         }
 
-        for (int i = 0; i < usedCharactersList.size(); i++)
-            if (usedCharactersList.get(i) == letter)
+        for (Character c : usedCharactersList)
+            if (c == letter)
                 return;
 
         usedCharactersList.add(letter);
@@ -115,120 +253,69 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
     }
 
     @Override
-    public boolean isWon() {
-        if (word == null || hiddenWord == null)
-            return false;
-
-        for (int i = 0; i < word.length(); i++)
-            if (word.charAt(i) != hiddenWord.charAt(i))
-                return false;
-
-        return true;
-    }
-
-    @Override
-    public boolean isLost() {
-        return life == 0;
-    }
-
-    @Override
-    public String getUsedCharacters() {
-        String usedCharactersString = "";
-        for (int i = 0; i < usedCharactersList.size(); i++) {
-            if (i + 1 < usedCharactersList.size())
-                usedCharactersString += usedCharactersList.get(i) + ", ";
-            else
-                usedCharactersString += usedCharactersList.get(i);
-        }
-        return usedCharactersString;
-    }
-
-    @Override
-    public void startTimer() {
-
-    }
-
-    @Override
-    public int getTimeElapsed() {
-        return time;
-    }
-
-    @Override
-    public void stopAndResetTimer() {
-        time = 0;
-    }
-
-    @Override
-    public void addScore(int score) {
-        this.score += score;
-    }
-
-    @Override
-    public void reset() {
-        initWordList();
-        word = getRandomWord();
-        hiddenWord = createHiddenWord();
-        stopAndResetTimer();
-        life = MAXIMUM_LIFE;
-        score = 0;
-        usedCharactersList = new ArrayList<>();
-    }
-
-    @Override
-    public int getLifeLeft() {
+    public int getGameLife() throws RemoteException {
         return life;
     }
 
     @Override
-    public int getScore() {
+    public int getGameScore() throws RemoteException {
         return score;
     }
 
+    /************************************************
+     *    USER AUTHORIZATION LOGIC RESIDES HERE!    *
+     ************************************************/
     @Override
-    public int getWordScore() {
-        return hiddenWord.length();
-    }
-
-    @Override
-    public String getUsedCharactersString() {
-        StringBuilder sb = new StringBuilder();
-        for (Character s : usedCharactersList)
-            sb.append(s);
-        return sb.toString();
-    }
-
-    @Override
-    public String getHiddenWord() {
-        return hiddenWord;
-    }
-
-    @Override
-    public String getWord() {
-        return word;
-    }
-
-    @Override
-    public void decreaseLife() {
-        life -= 1;
-    }
-
-    @Override
-    public boolean isCharGuessed(char character) {
-        for (Character c : usedCharactersList)
-            if (c == character) return true;
-        return false;
-    }
-
-    @Override
-    public boolean guess(char character) {
-        useCharacter(character);
-
-        if (word.contains(Character.toString(character))) {
-            removeCharacter(character);
-            return true;
-        } else {
-            return false;
+    public void logIn(String username, String password) throws RemoteException {
+        try {
+            currentUser = userController.hentBruger(username, password);
+        } catch (Exception e) {
+            throw new RemoteException("Log In failed!");
         }
+    }
+
+    @Override
+    public void logOut() throws RemoteException {
+        if (!isLoggedIn())
+            throw new RemoteException("Not logged in!");
+        currentUser = null;
+    }
+
+    @Override
+    public void setUserField(String username, String password, String userFieldKey, String value) throws RemoteException {
+        try {
+            userController.setEkstraFelt(username, password, userFieldKey, value);
+        } catch (RemoteException e) {
+            throw new RemoteException("Failed setting user field '" + value + "' at key '" + userFieldKey + "!");
+        }
+    }
+
+    @Override
+    public String getUserField(String username, String password, String userFieldKey) throws RemoteException {
+        try {
+            Object userField = userController.getEkstraFelt(username, password, userFieldKey);
+            String userFieldString = (String) userField;
+
+            if (userFieldKey.equals(Utils.HIGH_SCORE_FIELD_KEY))
+                if (userFieldString == null || userFieldString.equals("null"))
+                    userFieldString = "0";
+
+            return userFieldString;
+        } catch (RemoteException e) {
+            throw new RemoteException("No user field found at key '" + userFieldKey + "!");
+        }
+    }
+
+    @Override
+    public Bruger getCurrentUser() throws RemoteException {
+        if (!isLoggedIn())
+            throw new RemoteException("Not logged in!");
+        return currentUser;
+    }
+
+    @Override
+    public boolean isLoggedIn() throws RemoteException {
+        return currentUser != null;
     }
 
 }

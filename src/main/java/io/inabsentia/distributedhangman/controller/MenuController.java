@@ -1,13 +1,13 @@
 package io.inabsentia.distributedhangman.controller;
 
 import brugerautorisation.data.Bruger;
-import io.inabsentia.distributedhangman.controller.exceptions.UserControllerException;
 import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
 import io.inabsentia.distributedhangman.controller.interfaces.IMenuController;
-import io.inabsentia.distributedhangman.controller.interfaces.IUserController;
+import io.inabsentia.distributedhangman.logic.IGameLogic;
 import io.inabsentia.distributedhangman.ui.Tui;
 import io.inabsentia.distributedhangman.util.Utils;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 
 public final class MenuController implements IMenuController {
@@ -17,8 +17,8 @@ public final class MenuController implements IMenuController {
 
     /* Singleton Objects */
     private final Tui tui = Tui.getInstance();
-    private final IUserController userController = UserController.getInstance();
     private final IGameController gameController = GameController.getInstance();
+    private final IGameLogic logic;
 
     /* Static Singleton instance */
     private static IMenuController instance;
@@ -37,8 +37,8 @@ public final class MenuController implements IMenuController {
     /*
      * Private constructor for Singleton.
      */
-    private MenuController() {
-
+    private MenuController() throws Exception {
+        logic = (IGameLogic) Naming.lookup(Utils.RMI_STUB_URL_REMOTE_LOGIC_JAVABOG);
     }
 
     /*
@@ -60,16 +60,20 @@ public final class MenuController implements IMenuController {
             clearScreenHelper();
             tui.printMenu(getUserHelper(), isCLSOn);
 
-            executeUserCommand(command);
+            try {
+                executeUserCommand(command);
+            } catch (RemoteException e) {
+                tui.printError();
+            }
         }
 
     }
 
     @Override
-    public void executeUserCommand(String command) {
+    public void executeUserCommand(String command) throws RemoteException {
         switch (command) {
             case "q":
-                if (!userController.isSignedIn()) {
+                if (!logic.isLoggedIn()) {
                     tui.printSignInPrompt();
                     signIn();
                 } else {
@@ -77,36 +81,27 @@ public final class MenuController implements IMenuController {
                 }
                 break;
             case "w":
-                if (userController.isSignedIn())
+                if (logic.isLoggedIn())
                     signOut();
                 else
                     tui.printUnrecognizedCommand();
                 break;
             case "e":
-                if (userController.isSignedIn()) {
-                    try {
-                        gameController.start();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                } else {
+                if (logic.isLoggedIn())
+                    gameController.start();
+                else
                     tui.printUnrecognizedCommand();
-                }
                 break;
             case "r":
-                if (userController.isSignedIn())
+                if (logic.isLoggedIn())
                     tui.printUserInformation(getUserHelper());
                 else
                     tui.printUnrecognizedCommand();
                 break;
             case "a":
-                if (userController.isSignedIn()) {
-                    try {
-                        String highscore = userController.getUserField(getUserHelper().brugernavn, getUserHelper().adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
-                        tui.printUserHighScore(getUserHelper(), highscore);
-                    } catch (UserControllerException e) {
-                        e.printStackTrace();
-                    }
+                if (logic.isLoggedIn()) {
+                    String highscore = logic.getUserField(getUserHelper().brugernavn, getUserHelper().adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
+                    tui.printUserHighScore(getUserHelper(), highscore);
                 } else {
                     tui.printUnrecognizedCommand();
                 }
@@ -138,12 +133,12 @@ public final class MenuController implements IMenuController {
         clearScreenHelper();
 
         try {
-            userController.signIn(username, password);
+            logic.logIn(username, password);
             tui.printMenu(getUserHelper(), isCLSOn);
-            tui.printSignInSuccess();
-        } catch (UserControllerException e) {
+            tui.printLogInSuccess();
+        } catch (RemoteException e) {
             tui.printMenu(getUserHelper(), isCLSOn);
-            tui.printSignInFailure();
+            tui.printLogInFailure();
         }
     }
 
@@ -151,10 +146,10 @@ public final class MenuController implements IMenuController {
     public void signOut() {
         clearScreenHelper();
         try {
-            userController.signOut();
+            logic.logOut();
             tui.printMenu(getUserHelper(), isCLSOn);
             tui.printSignOutSuccess();
-        } catch (UserControllerException e) {
+        } catch (RemoteException e) {
             tui.printMenu(getUserHelper(), isCLSOn);
             tui.printSignOutFailure();
         }
@@ -168,10 +163,8 @@ public final class MenuController implements IMenuController {
 
     private Bruger getUserHelper() {
         try {
-            Bruger user;
-            user = userController.getUser();
-            return user;
-        } catch (UserControllerException e) {
+            return logic.getCurrentUser();
+        } catch (RemoteException e) {
             return null;
         }
     }

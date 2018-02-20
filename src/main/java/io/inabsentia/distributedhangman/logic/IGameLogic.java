@@ -1,24 +1,44 @@
 package io.inabsentia.distributedhangman.logic;
 
+import brugerautorisation.data.Bruger;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface IGameLogic extends Remote {
-    boolean isWon() throws RemoteException;
-    boolean isLost() throws RemoteException;
-    String getUsedCharacters() throws RemoteException;
-    void startTimer() throws RemoteException;
-    int getTimeElapsed() throws RemoteException;
-    void stopAndResetTimer() throws RemoteException;
-    void addScore(int score) throws RemoteException;
-    void reset() throws RemoteException;
-    int getLifeLeft() throws RemoteException;
-    int getScore() throws RemoteException;
-    int getWordScore() throws RemoteException;
+    /* Game Logic */
+    boolean guessCharacter(char character) throws RemoteException;
+    void addGameScore(int score) throws RemoteException;
+
     void decreaseLife() throws RemoteException;
-    boolean isCharGuessed(char character) throws RemoteException;
-    boolean guess(char character) throws RemoteException;
-    String getUsedCharactersString() throws RemoteException;
+    void resetGame() throws RemoteException;
+
+    void startGameTimer() throws RemoteException;
+    void stopGameTimer() throws RemoteException;
+    void resetGameTimer() throws RemoteException;
+    int getGameTimeElapsed() throws RemoteException;
+
+    String getUsedCharacters() throws RemoteException;
+
     String getHiddenWord() throws RemoteException;
-    String getWord() throws RemoteException;
+    String getGameWord() throws RemoteException;
+
+    int getGameLife() throws RemoteException;
+    int getGameScore() throws RemoteException;
+    int getWordScore() throws RemoteException;
+
+    boolean isGameWon() throws RemoteException;
+    boolean isGameLost() throws RemoteException;
+    boolean isHighScore(int score) throws RemoteException;
+    boolean isCharGuessed(char character) throws RemoteException;
+
+    /* User Authorization */
+    void logIn(String username, String password) throws RemoteException;
+    void logOut() throws RemoteException;
+
+    void setUserField(String username, String password, String userFieldKey, String value) throws RemoteException;
+    String getUserField(String username, String password, String userFieldKey) throws RemoteException;
+
+    Bruger getCurrentUser() throws RemoteException;
+    boolean isLoggedIn() throws RemoteException;
 }
