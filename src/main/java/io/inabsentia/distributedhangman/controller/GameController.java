@@ -2,9 +2,9 @@ package io.inabsentia.distributedhangman.controller;
 
 import brugerautorisation.data.Bruger;
 import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
-import io.inabsentia.distributedhangman.logic.IGameLogic;
 import io.inabsentia.distributedhangman.ui.Tui;
 import io.inabsentia.distributedhangman.util.Utils;
+import io.inabsentia.gameserver.logic.IGameLogic;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -37,6 +37,7 @@ public final class GameController implements IGameController {
     private GameController() throws Exception {
         scanner = new Scanner(System.in);
         logic = (IGameLogic) Naming.lookup(Utils.RMI_STUB_URL_REMOTE_LOGIC_JAVABOG);
+
     }
 
     /*

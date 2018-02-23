@@ -1,4 +1,4 @@
-package io.inabsentia.distributedhangman.logic;
+package io.inabsentia.gameserver.logic;
 
 import brugerautorisation.data.Bruger;
 
