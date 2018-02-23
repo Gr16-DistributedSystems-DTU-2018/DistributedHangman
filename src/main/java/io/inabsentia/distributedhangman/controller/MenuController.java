@@ -5,7 +5,7 @@ import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
 import io.inabsentia.distributedhangman.controller.interfaces.IMenuController;
 import io.inabsentia.distributedhangman.ui.Tui;
 import io.inabsentia.distributedhangman.util.Utils;
-import io.inabsentia.gameserver.logic.IGameLogic;
+import io.inabsentia.gameserver.logic.rmi.IGameLogic;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
