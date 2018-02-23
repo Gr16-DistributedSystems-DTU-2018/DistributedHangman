@@ -111,14 +111,10 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
 
     @Override
     public String getUsedCharacters() throws RemoteException {
-        String usedCharactersString = "";
-        for (int i = 0; i < usedCharactersList.size(); i++) {
-            if (i + 1 < usedCharactersList.size())
-                usedCharactersString += usedCharactersList.get(i) + ", ";
-            else
-                usedCharactersString += usedCharactersList.get(i);
-        }
-        return usedCharactersString;
+        StringBuilder sb = new StringBuilder();
+        for (Character c : usedCharactersList)
+            sb.append(c);
+        return sb.toString();
     }
 
     @Override
@@ -223,7 +219,7 @@ public final class GameLogic extends UnicastRemoteObject implements IGameLogic {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < word.length(); i++)
-            sb.append("○");
+            sb.append("•");
         hiddenWord = sb.toString();
 
         return hiddenWord;

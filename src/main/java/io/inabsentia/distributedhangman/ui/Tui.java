@@ -350,7 +350,7 @@ public final class Tui {
     }
 
     public final void printHangman(String playerName, int elapsedSeconds, int lifeLeft, int score, String hiddenWord, String usedCharacters) {
-        String[] hangmanBodyChars = {"0", "/", "|", "\\", "/", "\\"};
+        String[] hangmanBodyChars = {"○", "/", "|", "\\", "/", "\\"};
         String[] hangmanBody = new String[6];
 
         int maximumStringLength = 6;
