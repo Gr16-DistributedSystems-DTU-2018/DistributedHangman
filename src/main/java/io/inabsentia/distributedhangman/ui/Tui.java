@@ -457,7 +457,7 @@ public final class Tui {
         printArrow(arrow, postfix);
         String command = scanner.nextLine();
 
-        if (command.equals("") || command.equals(" "))
+        if (command.equals(""))
             return " ";
 
         return command;
