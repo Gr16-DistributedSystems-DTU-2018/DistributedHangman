@@ -450,12 +450,12 @@ public final class Tui {
 
     public String getUserCommand(String arrow) {
         printArrow(arrow);
-        return scanner.nextLine().toLowerCase();
+        return scanner.nextLine();
     }
 
     public String getUserCommand(String arrow, String postfix) {
         printArrow(arrow, postfix);
-        String command = scanner.nextLine().toLowerCase();
+        String command = scanner.nextLine();
 
         if (command.equals("") || command.equals(" "))
             return " ";

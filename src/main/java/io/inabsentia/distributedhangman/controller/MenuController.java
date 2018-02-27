@@ -71,6 +71,7 @@ public final class MenuController implements IMenuController {
 
     @Override
     public void executeUserCommand(String command) throws RemoteException {
+        command = command.toLowerCase();
         switch (command) {
             case "q":
                 if (!logic.isLoggedIn()) {
