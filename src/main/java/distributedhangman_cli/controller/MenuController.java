@@ -1,11 +1,11 @@
-package io.inabsentia.distributedhangman.controller;
+package distributedhangman_cli.controller;
 
 import brugerautorisation.data.Bruger;
-import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
-import io.inabsentia.distributedhangman.controller.interfaces.IMenuController;
-import io.inabsentia.distributedhangman.ui.Tui;
-import io.inabsentia.distributedhangman.util.Utils;
-import io.inabsentia.gameserver.logic.rmi.IGameLogic;
+import distributedhangman_cli.controller.interfaces.IGameController;
+import distributedhangman_cli.controller.interfaces.IMenuController;
+import distributedhangman_cli.ui.Tui;
+import distributedhangman_cli.util.Utils;
+import server.logic.rmi.IGameLogic;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;

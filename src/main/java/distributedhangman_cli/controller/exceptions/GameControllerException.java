@@ -1,4 +1,4 @@
-package io.inabsentia.distributedhangman.controller.exceptions;
+package distributedhangman_cli.controller.exceptions;
 
 public class GameControllerException extends Exception {
 

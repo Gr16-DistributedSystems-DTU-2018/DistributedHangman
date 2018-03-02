@@ -1,7 +1,7 @@
-package io.inabsentia.distributedhangman.main;
+package distributedhangman_cli.main;
 
-import io.inabsentia.distributedhangman.controller.MenuController;
-import io.inabsentia.distributedhangman.controller.interfaces.IMenuController;
+import distributedhangman_cli.controller.MenuController;
+import distributedhangman_cli.controller.interfaces.IMenuController;
 
 public class Main {
 

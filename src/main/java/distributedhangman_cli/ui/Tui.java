@@ -1,7 +1,7 @@
-package io.inabsentia.distributedhangman.ui;
+package distributedhangman_cli.ui;
 
 import brugerautorisation.data.Bruger;
-import io.inabsentia.distributedhangman.util.Utils;
+import server.logic.rmi.GameLogic;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -363,7 +363,7 @@ public final class Tui {
             hangmanBody[i] = " ";
 
         for (int j = 0; j < lifeLeft; j++) {
-            if (j > Utils.MAXIMUM_LIFE - 1)
+            if (j > GameLogic.MAXIMUM_LIFE - 1)
                 break;
             hangmanBody[j] = hangmanBodyChars[j];
         }
@@ -433,19 +433,13 @@ public final class Tui {
         printMessage(sb.toString(), true, false);
     }
 
-    public final void printLoss(String secretWord) {
-        StringBuilder sb = new StringBuilder();
-        String secretWordStr = parseString(secretWord, 27, false);
-
-        sb.append("┌───────────────────────────┐\n");
-        sb.append("│     Oh dear, you lost!    │\n");
-        sb.append("├───────────────────────────┤\n");
-        sb.append("│       The word was:       │\n");
-        sb.append("│").append(secretWordStr).append("\n");
-        sb.append("│                           │\n");
-        sb.append("│  Better luck next time!   │\n");
-        sb.append("└───────────────────────────┘\n");
-        printMessage(sb.toString(), true, false);
+    public final void printLoss() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│     Oh dear, you lost!    │\n" +
+                "├───────────────────────────┤\n" +
+                "│  Better luck next time!   │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
     }
 
     public String getUserCommand(String arrow) {

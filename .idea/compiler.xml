@@ -7,11 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="DistributedHangman" />
+        <module name="DistributedHangmanCLI-Java" />
         <module name="Hangman" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="DistributedHangman" target="1.7" />
+      <module name="DistributedHangmanCLI-Java" target="1.7" />
       <module name="Hangman" target="1.7" />
     </bytecodeTargetLevel>
   </component>

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DistributedHangman.iml" filepath="$PROJECT_DIR$/DistributedHangman.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DistributedHangmanCLI-Java.iml" filepath="$PROJECT_DIR$/DistributedHangmanCLI-Java.iml" />
     </modules>
   </component>
 </project>

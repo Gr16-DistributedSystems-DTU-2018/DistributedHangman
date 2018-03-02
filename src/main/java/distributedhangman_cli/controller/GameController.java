@@ -1,10 +1,10 @@
-package io.inabsentia.distributedhangman.controller;
+package distributedhangman_cli.controller;
 
 import brugerautorisation.data.Bruger;
-import io.inabsentia.distributedhangman.controller.interfaces.IGameController;
-import io.inabsentia.distributedhangman.ui.Tui;
-import io.inabsentia.distributedhangman.util.Utils;
-import io.inabsentia.gameserver.logic.rmi.IGameLogic;
+import distributedhangman_cli.controller.interfaces.IGameController;
+import distributedhangman_cli.ui.Tui;
+import distributedhangman_cli.util.Utils;
+import server.logic.rmi.IGameLogic;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -47,8 +47,9 @@ public final class GameController implements IGameController {
     }
 
     public void start() throws RemoteException {
-        /* Reset the logic */
+        /* Reset the logic and score */
         logic.resetGame();
+        logic.resetScore();
 
         /* Start the timer */
         logic.startGameTimer();
@@ -67,7 +68,7 @@ public final class GameController implements IGameController {
         }
 
         /* Print hangman */
-        tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getGameLife(), logic.getGameScore(), logic.getHiddenWord(), logic.getUsedCharacters());
+        tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getCurrentLife(), logic.getCurrentScore(), logic.getCurrentGuessedWord(), logic.getGuessedChars());
 
         /* Infinite game loop */
         while (true) {
@@ -79,7 +80,7 @@ public final class GameController implements IGameController {
                 guess = tui.getUserCommand(Utils.CMD_ARROW, "Guess").charAt(0);
                 if (logic.isCharGuessed(guess)) {
                     tui.clearScreen();
-                    tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getGameLife(), logic.getGameScore(), logic.getHiddenWord(), logic.getUsedCharacters());
+                    tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getCurrentLife(), logic.getCurrentScore(), logic.getCurrentGuessedWord(), logic.getGuessedChars());
                     tui.printAlreadyGuessed(guess);
                     continue;
                 }
@@ -90,35 +91,29 @@ public final class GameController implements IGameController {
             tui.clearScreen();
 
             /* Guess */
-            if (logic.guessCharacter(guess)) {
-                logic.addGameScore(Utils.SINGLE_CHAR_SCORE);
-                tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getGameLife(), logic.getGameScore(), logic.getHiddenWord(), logic.getUsedCharacters());
+            if (logic.guess(guess)) {
+                //logic.addGameScore(Utils.SINGLE_CHAR_SCORE);
+                tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getCurrentLife(), logic.getCurrentScore(), logic.getCurrentGuessedWord(), logic.getGuessedChars());
                 tui.printCorrectGuess();
             } else {
-                logic.decreaseLife();
-                tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getGameLife(), logic.getGameScore(), logic.getHiddenWord(), logic.getUsedCharacters());
+                //logic.decreaseLife();
+                tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getCurrentLife(), logic.getCurrentScore(), logic.getCurrentGuessedWord(), logic.getGuessedChars());
                 tui.printWrongGuess();
             }
 
             /* Check if the user has won */
-            if (isFinished(user, logic.isGameWon(), logic.isGameLost(), logic.getGameScore())) {
+            if (isFinished(user, logic.isGameWon(), logic.isGameLost(), logic.getCurrentScore())) {
                 if (playAgain()) {
-                    /* Save the old score if the user wants to play again */
-                    int saveScore = 0;
-                    if (logic.isGameWon())
-                        saveScore = logic.getGameScore();
+
+                    if (logic.isGameLost())
+                        logic.resetScore();
 
                     logic.resetGame();
 
-                    /* And add it back */
-                    logic.addGameScore(saveScore);
-
-                    logic.resetGameTimer();
                     tui.clearScreen();
-                    logic.startGameTimer();
-                    tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getGameLife(), logic.getGameScore(), logic.getHiddenWord(), logic.getUsedCharacters());
+                    tui.printHangman(user.fornavn, logic.getGameTimeElapsed(), logic.getCurrentLife(), logic.getCurrentScore(), logic.getCurrentGuessedWord(), logic.getGuessedChars());
                 } else {
-                    addHighScore(user, logic.getGameScore());
+                    addHighScore(user);
                     tui.clearScreen();
                     tui.printMenu(user, false);
                     break;
@@ -131,17 +126,16 @@ public final class GameController implements IGameController {
     private boolean isFinished(Bruger user, boolean isWon, boolean isLost, int score) {
         try {
             if (isWon) {
-                tui.printWin(logic.getGameWord());
+                tui.printWin(logic.getCurrentGuessedWord());
                 tui.getUserCommand(Utils.CMD_ARROW, "Press Enter");
-                showScore(logic.getGameScore());
+                showScore();
                 tui.getUserCommand(Utils.CMD_ARROW, "Press Enter");
-                addHighScore(user, score);
+                addHighScore(user);
                 return true;
             } else if (isLost) {
-                tui.printLoss(logic.getGameWord());
+                tui.printLoss();
                 tui.getUserCommand(Utils.CMD_ARROW, "Press Enter");
-
-                showScore(logic.getGameScore());
+                showScore();
                 tui.getUserCommand(Utils.CMD_ARROW, "Press Enter");
                 return true;
             }
@@ -164,22 +158,22 @@ public final class GameController implements IGameController {
     // If a high score was achieved, show it
     // then save it via the UserController
     // if a high score was not acheived, just print the score.
-    private void showScore(int score) {
+    private void showScore() {
         try {
-            boolean isHighScore = logic.isHighScore(score);
-            tui.printNewScore(Integer.toString(score), isHighScore);
+            boolean isHighScore = logic.isHighScore();
+            tui.printNewScore(Integer.toString(logic.getCurrentScore()), isHighScore);
         } catch (RemoteException e) {
             e.printStackTrace();
             tui.printError();
         }
     }
 
-    private void addHighScore(Bruger user, int score) {
+    private void addHighScore(Bruger user) {
         try {
-            boolean isHighScore = logic.isHighScore(score);
+            boolean isHighScore = logic.isHighScore();
 
             if (isHighScore)
-                logic.setUserField(user.brugernavn, user.adgangskode, Utils.HIGH_SCORE_FIELD_KEY, String.valueOf(score));
+                logic.setUserField(user.brugernavn, user.adgangskode, Utils.HIGH_SCORE_FIELD_KEY, String.valueOf(logic.getCurrentScore()));
 
         } catch (RemoteException e) {
             e.printStackTrace();

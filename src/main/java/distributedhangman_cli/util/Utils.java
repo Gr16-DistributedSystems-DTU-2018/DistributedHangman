@@ -1,4 +1,4 @@
-package io.inabsentia.distributedhangman.util;
+package distributedhangman_cli.util;
 
 public final class Utils {
 
@@ -13,9 +13,6 @@ public final class Utils {
     public final static String RMI_STUB_URL_REMOTE_LOGIC = "rmi://localhost:" + REMOTE_PORT + "/gamelogicservice";
     public final static String HIGH_SCORE_FIELD_KEY = "s151641_highscore";
 
-    public static final int SINGLE_CHAR_SCORE = 10;
-
-    public final static int MAXIMUM_LIFE = 6;
 
     /* Static Singleton instance */
     private static Utils instance;
