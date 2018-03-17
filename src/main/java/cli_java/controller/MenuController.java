@@ -3,23 +3,22 @@ package cli_java.controller;
 import brugerautorisation.data.Bruger;
 import cli_java.controller.interfaces.IGameController;
 import cli_java.controller.interfaces.IMenuController;
+import cli_java.handler.UserHandler;
 import cli_java.ui.Tui;
 import server.logic.rmi.IGameLobby;
 import server.util.Utils;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public final class MenuController implements IMenuController {
 
-    /* Fields */
-    public static String USERNAME = "NONE";
-
     /* Singleton Objects */
-    private final Tui tui = Tui.getInstance();
     private final IGameController gameController = GameController.getInstance();
+    private final Tui tui = Tui.getInstance();
 
     private final IGameLobby lobby;
 
@@ -40,9 +39,12 @@ public final class MenuController implements IMenuController {
     /*
      * Private constructor for Singleton.
      */
-    private MenuController() throws Exception {
-        //logic = (IGameLogic) Naming.lookup(Utils.RMI_STUB_URL_REMOTE_LOGIC_JAVABOG);
-        lobby = (IGameLobby) Naming.lookup(Utils.RMI_LOBBY_STUB_URL_LOCAL);
+    private MenuController() {
+        try {
+            lobby = (IGameLobby) Naming.lookup(Utils.RMI_LOBBY_STUB_URL_LOCAL);
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            throw new RuntimeException("Failed to get the RMI Lobby stub!");
+        }
     }
 
     /*
@@ -54,7 +56,6 @@ public final class MenuController implements IMenuController {
 
     @Override
     public void start() {
-
         tui.printMenu(getUserHelper());
 
         while (true) {
@@ -74,36 +75,76 @@ public final class MenuController implements IMenuController {
     public void executeUserCommand(String command) throws RemoteException {
         command = command.toLowerCase();
         switch (command) {
-            case "1":
-                tui.printSignInPrompt();
-                logIn();
-                break;
-            case "2":
-                logOut();
-                break;
-            case "3":
-                gameController.start();
-                break;
-            case "4":
-                List<String> users = lobby.getAllCurrentUserNames();
-                List<Integer> scores = new ArrayList<>();
-                for (String user : users) {
-                    int score = lobby.getGameLogicInstance(user).getScore();
-                    scores.add(score);
+            case "q":
+                if (!UserHandler.isLoggedIn()) {
+                    tui.printLogInPrompt();
+                    logIn();
+                } else {
+                    tui.printUnrecognizedCommand();
                 }
-                tui.printLobby(users, scores);
                 break;
-            case "5":
-                tui.printUserInformation(getUserHelper());
+            case "w":
+                if (UserHandler.isLoggedIn()) {
+                    logOut();
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
                 break;
-            case "6":
-                //String highscore = logic.getUserField(getUserHelper().brugernavn, getUserHelper().adgangskode, Utils.HIGH_SCORE_FIELD_KEY);
-                //tui.printUserHighScore(getUserHelper(), highscore);
+            case "e":
+                if (UserHandler.isLoggedIn()) {
+                    tui.printUserInformation(getUserHelper());
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
                 break;
-            case "7":
+            case "r":
+                if (UserHandler.isLoggedIn()) {
+                    gameController.start();
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
+                break;
+            case "t":
+                if (UserHandler.isLoggedIn()) {
+                    Map<String, Integer> scoreMap = lobby.getAllUsersScore();
+                    tui.printLobby(scoreMap);
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
+                break;
+            case "a":
+                if (UserHandler.isLoggedIn()) {
+                    Map<String, Integer> highscoreMap = lobby.getAllUsersScore();
+                    tui.printHighScoreList(highscoreMap);
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
+                break;
+            case "s":
+                if (UserHandler.isLoggedIn()) {
+                    // Send Email
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
+                break;
+            case "d":
+                if (!UserHandler.isLoggedIn()) {
+                    // Forgot Pass
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
+                break;
+            case "f":
+                if (UserHandler.isLoggedIn()) {
+                    // New Pass
+                } else {
+                    tui.printUnrecognizedCommand();
+                }
+                break;
+            case "g":
                 tui.printAbout();
                 break;
-            case "0":
+            case "x":
                 tui.printExit();
                 exit();
                 break;
@@ -126,7 +167,7 @@ public final class MenuController implements IMenuController {
                 lobby.logIn(username, password);
             }
 
-            MenuController.USERNAME = username;
+            UserHandler.setCurrentUsername(username);
             tui.printMenu(getUserHelper());
             tui.printLogInSuccess();
         } catch (RemoteException e) {
@@ -138,27 +179,49 @@ public final class MenuController implements IMenuController {
     @Override
     public void logOut() {
         try {
-            lobby.logOut(USERNAME);
-            MenuController.USERNAME = "NONE";
+            if (!UserHandler.getCurrentUsername().equals(UserHandler.NOT_LOGGED_IN)) {
+                lobby.logOut(UserHandler.getCurrentUsername());
+                UserHandler.resetUsername();
+            } else {
+                return;
+            }
             tui.printMenu(getUserHelper());
-            tui.printSignOutSuccess();
+            tui.printLogOutSuccess();
         } catch (RemoteException e) {
             tui.printMenu(getUserHelper());
-            tui.printSignOutFailure();
+            tui.printLogOutFailure();
         }
     }
 
     @Override
     public void exit() {
+        try {
+            if (!UserHandler.getCurrentUsername().equals(UserHandler.NOT_LOGGED_IN))
+                lobby.logOut(UserHandler.getCurrentUsername());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         System.exit(0);
     }
 
     private Bruger getUserHelper() {
         try {
-            return lobby.getLoggedInUser(USERNAME);
+            return lobby.getLoggedInUser(UserHandler.getCurrentUsername());
         } catch (RemoteException e) {
             return null;
         }
+    }
+
+    private void sendEmail() {
+
+    }
+
+    private void forgotPassword() {
+
+    }
+
+    private void newPassword() {
+
     }
 
 }

@@ -2,6 +2,7 @@ package cli_java.controller;
 
 import brugerautorisation.data.Bruger;
 import cli_java.controller.interfaces.IGameController;
+import cli_java.handler.UserHandler;
 import cli_java.ui.Tui;
 import server.logic.rmi.IGameLobby;
 import server.logic.rmi.IGameLogic;
@@ -10,8 +11,6 @@ import server.util.Utils;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Scanner;
-
-import static cli_java.controller.MenuController.USERNAME;
 
 public final class GameController implements IGameController {
 
@@ -62,7 +61,7 @@ public final class GameController implements IGameController {
         /* Get user */
         Bruger user;
         try {
-            user = lobby.getLoggedInUser(USERNAME);
+            user = lobby.getLoggedInUser(UserHandler.getCurrentUsername());
         } catch (RemoteException e) {
             e.printStackTrace();
             tui.printError();
@@ -162,7 +161,7 @@ public final class GameController implements IGameController {
     // if a high score was not acheived, just print the score.
     private void showScore() {
         try {
-            boolean isHighScore = logic.isHighScore(USERNAME, "godkode");
+            boolean isHighScore = logic.isHighScore(UserHandler.getCurrentUsername(), "godkode");
             tui.printNewScore(Integer.toString(logic.getScore()), isHighScore);
         } catch (RemoteException e) {
             e.printStackTrace();

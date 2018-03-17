@@ -4,7 +4,7 @@ import brugerautorisation.data.Bruger;
 import server.logic.local.GameLogic;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /*
@@ -49,7 +49,7 @@ public final class Tui {
     /*
      * Method to print log in prompt.
      */
-    public final void printSignInPrompt() {
+    public final void printLogInPrompt() {
         String msg = "┌───────────────────────────┐\n" +
                 "│           Log In          │\n" +
                 "├───────────────────────────┤\n" +
@@ -86,7 +86,7 @@ public final class Tui {
     /*
      * Method to print sign out success.
      */
-    public final void printSignOutSuccess() {
+    public final void printLogOutSuccess() {
         String msg = "┌───────────────────────────┐\n" +
                 "│          Log Out          │\n" +
                 "├───────────────────────────┤\n" +
@@ -99,7 +99,7 @@ public final class Tui {
     /*
      * Method to print sign out failure.
      */
-    public final void printSignOutFailure() {
+    public final void printLogOutFailure() {
         String msg = "┌───────────────────────────┐\n" +
                 "│          Log Out          │\n" +
                 "├───────────────────────────┤\n" +
@@ -140,28 +140,40 @@ public final class Tui {
         sb.append(text).append("\n");
 
         sb.append("├───────────────────────────┤\n");
-        sb.append("│ (Key)          Command    │\n");
+        sb.append("│ (Key)         Command     │\n");
         sb.append("├───────────────────────────┤\n");
 
         if (user == null)
-            sb.append("│ (1)            Log In     │\n");
+            sb.append("│ (q)           Log In      │\n");
 
-        if (user != null)
-            sb.append("│ (2)            Log Out    │\n");
+        if (user != null) {
+            sb.append("│ (w)           Log Out     │\n");
+            sb.append("│ (e)           User Info   │\n");
+        }
 
         sb.append("│                           │\n");
 
         if (user != null) {
-            sb.append("│ (3)            Play       │\n");
-            sb.append("│ (4)            Show Lobby │\n");
-            sb.append("│                           │\n");
-            sb.append("│ (5)            User (i)   │\n");
-            sb.append("│ (6)            User Score │\n");
+            sb.append("│ (r)           Play        │\n");
+            sb.append("│ (t)           Show Lobby  │\n");
+            sb.append("│ (a)           High scores │\n");
             sb.append("│                           │\n");
         }
 
-        sb.append("│ (7)            About      │\n");
-        sb.append("│ (0)            Exit       │\n");
+        if (user != null) {
+            sb.append("│ (s)           Send Email  │\n");
+        }
+
+        if (user == null)
+            sb.append("│ (d)           Forgot Pass │\n");
+
+        if (user != null) {
+            sb.append("│ (f)           New Pass    │\n");
+        }
+
+        sb.append("│                           │\n");
+        sb.append("│ (g)           About       │\n");
+        sb.append("│ (x)           Exit        │\n");
         sb.append("└───────────────────────────┘\n");
 
         printMessage(sb.toString(), true, false);
@@ -253,31 +265,6 @@ public final class Tui {
         sb.append("│ Study Field  : ").append(studyField).append("\n");
         sb.append("│ Last Active  : ").append(lastActive).append("\n");
         sb.append("└───────────────────────────────────────┘\n");
-        printMessage(sb.toString(), true, false);
-    }
-
-    /*
-     * Method to print user high score.
-     */
-    public final void printUserHighScore(Bruger user, String highScore) {
-        if (user == null)
-            return;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("┌───────────────────────────┐\n");
-        sb.append("│         High Score        │\n");
-        sb.append("├───────────────────────────┤\n");
-
-        String userText = user.fornavn + " " + user.efternavn;
-        userText = parseString(userText, 27, true) + "\n";
-        sb.append(userText);
-        sb.append("├───────────────────────────┤\n");
-
-        int lineLength = 14;
-        String highscoreString = parseString(highScore, lineLength, false);
-
-        sb.append("│ High Score: ").append(highscoreString).append("\n");
-        sb.append("└───────────────────────────┘\n");
         printMessage(sb.toString(), true, false);
     }
 
@@ -374,16 +361,6 @@ public final class Tui {
         printMessage(msg, true, false);
     }
 
-    public final void printFirstGuessInfo() {
-        String msg = "┌───────────────────────────┐\n" +
-                "│            Play           │\n" +
-                "├───────────────────────────┤\n" +
-                "│     Go ahead and take     │\n" +
-                "│     your first guess!     │\n" +
-                "└───────────────────────────┘\n";
-        printMessage(msg, true, false);
-    }
-
     public final void printCorrectGuess() {
         String msg = "┌───────────────────────────┐\n" +
                 "│           Guess           │\n" +
@@ -441,7 +418,26 @@ public final class Tui {
         return command;
     }
 
-    public void printLobby(List<String> users, List<Integer> currentScores) {
+    public void printHighScoreList(Map<String, Integer> highscoreMap) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│         High scores       │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ Username       High score │\n");
+        sb.append("├───────────────────────────┤\n");
+
+        for (String user : highscoreMap.keySet()) {
+            int score = highscoreMap.get(user);
+            sb.append("│ ").append(addLeadingSpacesToString(user, 8)).append("      ").append(addLeadingSpacesToString(String.valueOf(score), 11)).append(" │\n");
+        }
+
+        sb.append("└───────────────────────────┘\n");
+
+        printMessage(sb.toString(), true, false);
+    }
+
+    public void printLobby(Map<String, Integer> scoreMap) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("┌───────────────────────────┐\n");
@@ -450,8 +446,9 @@ public final class Tui {
         sb.append("│ Username       Live Score │\n"); // 27 i alt 27 - 11 = 16
         sb.append("├───────────────────────────┤\n");
 
-        for (int i = 0; i < users.size(); i++) {
-            sb.append("│ ").append(addLeadingSpacesToString(users.get(i), 8)).append("      ").append(addLeadingSpacesToString(String.valueOf(currentScores.get(i)), 10)).append("  │\n");
+        for (String user : scoreMap.keySet()) {
+            int score = scoreMap.get(user);
+            sb.append("│ ").append(addLeadingSpacesToString(user, 8)).append("      ").append(addLeadingSpacesToString(String.valueOf(score), 11)).append(" │\n");
         }
 
         sb.append("└───────────────────────────┘\n");
