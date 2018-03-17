@@ -1,4 +1,4 @@
-package distributedhangman_cli.controller.exceptions;
+package cli_java.controller.exceptions;
 
 public class GameControllerException extends Exception {
 

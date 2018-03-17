@@ -1,11 +1,11 @@
-package distributedhangman_cli.controller.interfaces;
+package cli_java.controller.interfaces;
 
 import java.rmi.RemoteException;
 
 public interface IMenuController {
     void start();
     void executeUserCommand(String command) throws RemoteException;
-    void signIn();
-    void signOut();
+    void logIn();
+    void logOut();
     void exit();
 }

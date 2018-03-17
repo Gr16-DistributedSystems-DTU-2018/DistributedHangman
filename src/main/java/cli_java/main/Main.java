@@ -1,7 +1,7 @@
-package distributedhangman_cli.main;
+package cli_java.main;
 
-import distributedhangman_cli.controller.MenuController;
-import distributedhangman_cli.controller.interfaces.IMenuController;
+import cli_java.controller.MenuController;
+import cli_java.controller.interfaces.IMenuController;
 
 public class Main {
 

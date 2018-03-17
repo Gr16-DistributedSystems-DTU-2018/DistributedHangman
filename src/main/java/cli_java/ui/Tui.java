@@ -1,9 +1,10 @@
-package distributedhangman_cli.ui;
+package cli_java.ui;
 
 import brugerautorisation.data.Bruger;
-import server.logic.rmi.GameLogic;
+import server.logic.local.GameLogic;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 /*
@@ -122,7 +123,7 @@ public final class Tui {
     /*
      * Method to print menu screen.
      */
-    public final void printMenu(Bruger user, boolean isCLSOn) {
+    public final void printMenu(Bruger user) {
         StringBuilder sb = new StringBuilder();
 
         String loggedInMessage = "Not Logged In";
@@ -138,39 +139,29 @@ public final class Tui {
         String text = parseString(loggedInMessage, 27, true);
         sb.append(text).append("\n");
 
-        String isCLSOnStatus = "[OFF]";
-
-        if (isCLSOn)
-            isCLSOnStatus = "[ON]";
-
         sb.append("├───────────────────────────┤\n");
-        sb.append("│ <Key>          Command    │\n");
+        sb.append("│ (Key)          Command    │\n");
         sb.append("├───────────────────────────┤\n");
 
         if (user == null)
-            sb.append("│ <q>            Log In     │\n");
+            sb.append("│ (1)            Log In     │\n");
 
         if (user != null)
-            sb.append("│ <w>            Log Out    │\n");
+            sb.append("│ (2)            Log Out    │\n");
 
         sb.append("│                           │\n");
 
         if (user != null) {
-            sb.append("│ <e>            Play       │\n");
+            sb.append("│ (3)            Play       │\n");
+            sb.append("│ (4)            Show Lobby │\n");
             sb.append("│                           │\n");
-            sb.append("│ <r>            User (i)   │\n");
-            sb.append("│ <a>            User Score │\n");
+            sb.append("│ (5)            User (i)   │\n");
+            sb.append("│ (6)            User Score │\n");
             sb.append("│                           │\n");
         }
 
-        sb.append("│ <z>            CLS ").append(isCLSOnStatus);
-        if (!isCLSOn)
-            sb.append("  │\n");
-        else
-            sb.append("   │\n");
-
-        sb.append("│ <x>            About      │\n");
-        sb.append("│ <c>            Exit       │\n");
+        sb.append("│ (7)            About      │\n");
+        sb.append("│ (0)            Exit       │\n");
         sb.append("└───────────────────────────┘\n");
 
         printMessage(sb.toString(), true, false);
@@ -185,10 +176,6 @@ public final class Tui {
                 "├───────────────────────────┤\n" +
                 "│        Made at DTU        │\n" +
                 "│    Distributed Systems    │\n" +
-                "│                           │\n" +
-                "│ Works best on Windows CMD.│\n" +
-                "│ Enable CLS for a better   │\n" +
-                "│ experience on CMD.        │\n" +
                 "└───────────────────────────┘\n";
         printMessage(msg, true, false);
     }
@@ -316,15 +303,15 @@ public final class Tui {
     /*
      * Method to print the command line arrow with a postfix.
      */
-    public final void printArrow(String arrow, String postfix) {
-        printMessage("[" + postfix + "] " + arrow + " ", false, false);
+    public final void printArrow(String postfix) {
+        printMessage("[" + postfix + "] » ", false, false);
     }
 
     /*
      * Method to print the command line arrow.
      */
-    public final void printArrow(String arrow) {
-        printMessage(arrow + " ", false, false);
+    public final void printArrow() {
+        printMessage("» ", false, false);
     }
 
     private String parseString(String text, int lineLength, boolean withStartPipe) {
@@ -349,22 +336,19 @@ public final class Tui {
         return sb.toString();
     }
 
-    public final void printHangman(String playerName, int elapsedSeconds, int lifeLeft, int score, String hiddenWord, String usedCharacters) {
+    public final void printHangman(String playerName, int lifeLeft, int score, String hiddenWord, String usedCharacters) {
         String[] hangmanBodyChars = {"○", "/", "|", "\\", "/", "\\"};
         String[] hangmanBody = new String[6];
 
         int maximumStringLength = 6;
         String playerNameStr = addLeadingSpacesToString(playerName, maximumStringLength);
-        String elapsedSecondsStr = addLeadingSpacesToString(Integer.toString(elapsedSeconds), maximumStringLength);
         String lifeLeftStr = addLeadingSpacesToString(Integer.toString(lifeLeft), maximumStringLength);
         String scoreStr = addLeadingSpacesToString(Integer.toString(score), maximumStringLength);
 
         for (int i = 0; i < hangmanBody.length; i++)
             hangmanBody[i] = " ";
 
-        for (int j = 0; j < lifeLeft; j++) {
-            if (j > GameLogic.MAXIMUM_LIFE - 1)
-                break;
+        for (int j = lifeLeft; j <= GameLogic.MAXIMUM_LIFE; j++) {
             hangmanBody[j] = hangmanBodyChars[j];
         }
 
@@ -377,7 +361,7 @@ public final class Tui {
                 "├───────────────────────────┤\n" +
                 "│                ┌──────┐   │\n" +
                 "│ Name:  " + playerNameStr + "  │      │   |\n" +
-                "│ Time:  " + elapsedSecondsStr + "  │      " + hangmanBody[0] + "   │\n" +
+                "│               │      " + hangmanBody[0] + "   │\n" +
                 "│ Life:  " + lifeLeftStr + "  │     " + hangmanBody[1] + hangmanBody[2] + hangmanBody[3] + "  │\n" +
                 "│ Score: " + scoreStr + "  │     " + hangmanBody[4] + " " + hangmanBody[5] + "  │\n" +
                 "│                ┴          │\n" +
@@ -442,19 +426,37 @@ public final class Tui {
         printMessage(msg, true, false);
     }
 
-    public String getUserCommand(String arrow) {
-        printArrow(arrow);
+    public final String getUserCommand() {
+        printArrow();
         return scanner.nextLine();
     }
 
-    public String getUserCommand(String arrow, String postfix) {
-        printArrow(arrow, postfix);
+    public final String getUserCommand(String postfix) {
+        printArrow(postfix);
         String command = scanner.nextLine();
 
         if (command.equals(""))
             return " ";
 
         return command;
+    }
+
+    public void printLobby(List<String> users, List<Integer> currentScores) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("┌───────────────────────────┐\n");
+        sb.append("│           Lobby           │\n");
+        sb.append("├───────────────────────────┤\n");
+        sb.append("│ Username       Live Score │\n"); // 27 i alt 27 - 11 = 16
+        sb.append("├───────────────────────────┤\n");
+
+        for (int i = 0; i < users.size(); i++) {
+            sb.append("│ ").append(addLeadingSpacesToString(users.get(i), 8)).append("      ").append(addLeadingSpacesToString(String.valueOf(currentScores.get(i)), 10)).append("  │\n");
+        }
+
+        sb.append("└───────────────────────────┘\n");
+
+        printMessage(sb.toString(), true, false);
     }
 
     public final void printAlreadyGuessed(Character guess) {

@@ -1,4 +1,4 @@
-package distributedhangman_cli.controller.interfaces;
+package cli_java.controller.interfaces;
 
 import java.rmi.RemoteException;
 
