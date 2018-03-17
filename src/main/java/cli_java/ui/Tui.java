@@ -3,7 +3,6 @@ package cli_java.ui;
 import brugerautorisation.data.Bruger;
 import server.logic.local.GameLogic;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -155,8 +154,8 @@ public final class Tui {
 
         if (user != null) {
             sb.append("│ (r)           Play        │\n");
-            sb.append("│ (t)           Show Lobby  │\n");
-            sb.append("│ (a)           High scores │\n");
+            sb.append("│ (t)           Lobby       │\n");
+            sb.append("│ (a)           High Scores │\n");
             sb.append("│                           │\n");
         }
 
@@ -190,18 +189,6 @@ public final class Tui {
                 "│    Distributed Systems    │\n" +
                 "└───────────────────────────┘\n";
         printMessage(msg, true, false);
-    }
-
-    /*
-     * Method that clears the screen.
-     * NOTICE: ONLY works if executed in Windows command prompt/CMD.
-     */
-    public final void clearScreen() {
-        try {
-            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /*
@@ -287,6 +274,17 @@ public final class Tui {
         printMessage(msg, true, false);
     }
 
+    public final void printSendEmail() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│         Send Email        │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Please provide username,  │\n" +
+                "│ password, subject and     │\n" +
+                "│ message below.            │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
     /*
      * Method to print the command line arrow with a postfix.
      */
@@ -335,9 +333,10 @@ public final class Tui {
         for (int i = 0; i < hangmanBody.length; i++)
             hangmanBody[i] = " ";
 
-        for (int j = lifeLeft; j <= GameLogic.MAXIMUM_LIFE; j++) {
-            hangmanBody[j] = hangmanBodyChars[j];
-        }
+        int lifeDelta = GameLogic.MAXIMUM_LIFE - lifeLeft;
+
+        for (int i = 0; i < lifeDelta; i++)
+            hangmanBody[i] = hangmanBodyChars[i];
 
         String hiddenWordStr = parseString(hiddenWord, 27, false);
         usedCharacters = "- " + usedCharacters + " -";
@@ -347,8 +346,8 @@ public final class Tui {
                 "│    Distributed Hangman    │\n" +
                 "├───────────────────────────┤\n" +
                 "│                ┌──────┐   │\n" +
-                "│ Name:  " + playerNameStr + "  │      │   |\n" +
-                "│               │      " + hangmanBody[0] + "   │\n" +
+                "│ Name:  " + playerNameStr + "  │      │   │\n" +
+                "│                │      " + hangmanBody[0] + "   │\n" +
                 "│ Life:  " + lifeLeftStr + "  │     " + hangmanBody[1] + hangmanBody[2] + hangmanBody[3] + "  │\n" +
                 "│ Score: " + scoreStr + "  │     " + hangmanBody[4] + " " + hangmanBody[5] + "  │\n" +
                 "│                ┴          │\n" +
@@ -399,6 +398,90 @@ public final class Tui {
                 "│     Oh dear, you lost!    │\n" +
                 "├───────────────────────────┤\n" +
                 "│  Better luck next time!   │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public final void printNewPassword() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│        New Password       │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Please provide username,  │\n" +
+                "│ old password and new      │\n" +
+                "│ password.                 │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public final void printNewPasswordSuccess() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│        New Password       │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Successfully changed      │\n" +
+                "│ password!                 │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public final void printNewPasswordFailure() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│        New Password       │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Failed to change          │\n" +
+                "│ password!                 │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public final void printForgotPassword() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│      Forgot Password      │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Please provide username   │\n" +
+                "│ to receive password.      │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public void printForgotPasswordSuccess(String username) {
+        String msg = "┌───────────────────────────┐\n" +
+                "│      Forgot Password      │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Password has been emailed │\n" +
+                "│ to " + addLeadingSpacesToString(username, 18) + "     │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public void printForgotPasswordFailure() {
+        String msg = "┌───────────────────────────┐\n" +
+                "│      Forgot Password      │\n" +
+                "├───────────────────────────┤\n" +
+                "│   Failed to send email!   │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public final void printSendEmailSuccess(String user, String subject, String message) {
+        String msg = "\n┌───────────────────────────┐\n" +
+                "│         Send Email        │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Recipient: " + addLeadingSpacesToString(user, 10) + "     │\n" +
+                "│ Subject  : " + addLeadingSpacesToString(subject, 14) + " │\n" +
+                "│                           │\n" +
+                "│ Message:                  │\n" +
+                "│ " + addLeadingSpacesToString(message, 25) + " │\n" +
+                "└───────────────────────────┘\n";
+        printMessage(msg, true, false);
+    }
+
+    public final void printSendEmailFailure(String user) {
+        String msg = "┌───────────────────────────┐\n" +
+                "│         Send Email        │\n" +
+                "├───────────────────────────┤\n" +
+                "│ Recipient: " + addLeadingSpacesToString(user, 10) + "     │\n" +
+                "│                           │\n" +
+                "│   Failed to send email!   │\n" +
                 "└───────────────────────────┘\n";
         printMessage(msg, true, false);
     }

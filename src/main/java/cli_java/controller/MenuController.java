@@ -99,7 +99,7 @@ public final class MenuController implements IMenuController {
                 break;
             case "r":
                 if (UserHandler.isLoggedIn()) {
-                    gameController.start();
+                    gameController.start(lobby, lobby.getGameLogicInstance(UserHandler.getCurrentUsername()));
                 } else {
                     tui.printUnrecognizedCommand();
                 }
@@ -122,21 +122,21 @@ public final class MenuController implements IMenuController {
                 break;
             case "s":
                 if (UserHandler.isLoggedIn()) {
-                    // Send Email
+                    sendEmail();
                 } else {
                     tui.printUnrecognizedCommand();
                 }
                 break;
             case "d":
                 if (!UserHandler.isLoggedIn()) {
-                    // Forgot Pass
+                    forgotPassword();
                 } else {
                     tui.printUnrecognizedCommand();
                 }
                 break;
             case "f":
                 if (UserHandler.isLoggedIn()) {
-                    // New Pass
+                    newPassword();
                 } else {
                     tui.printUnrecognizedCommand();
                 }
@@ -156,23 +156,30 @@ public final class MenuController implements IMenuController {
 
     @Override
     public void logIn() {
-        String username = tui.getUserCommand("Username");
-        String password = tui.getUserCommand("Password");
+        while (true) {
+            String username = tui.getUserCommand("Username");
+            String password = tui.getUserCommand("Password");
 
-        try {
             try {
-                lobby.logIn(username, password);
-            } catch (IllegalArgumentException e) {
-                lobby.logOut(username);
-                lobby.logIn(username, password);
-            }
+                try {
+                    lobby.logIn(username, password);
+                } catch (IllegalArgumentException e) {
+                    lobby.logOut(username);
+                    lobby.logIn(username, password);
+                }
 
-            UserHandler.setCurrentUsername(username);
-            tui.printMenu(getUserHelper());
-            tui.printLogInSuccess();
-        } catch (RemoteException e) {
-            tui.printMenu(getUserHelper());
-            tui.printLogInFailure();
+                UserHandler.setCurrentUsername(username);
+                tui.printMenu(getUserHelper());
+                tui.printLogInSuccess();
+                break;
+            } catch (RemoteException e) {
+                tui.printMenu(getUserHelper());
+                tui.printLogInFailure();
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println();
+                tui.printLogInFailure();
+            }
         }
     }
 
@@ -213,15 +220,66 @@ public final class MenuController implements IMenuController {
     }
 
     private void sendEmail() {
+        while (true) {
+            tui.printSendEmail();
+            String username = tui.getUserCommand("Username");
+            String password = tui.getUserCommand("Password");
+            String subject = tui.getUserCommand("Subject");
+            String message = tui.getUserCommand("Message");
 
+            try {
+                subject = "Distributed Systems - Group 16: " + subject;
+                lobby.sendUserEmail(username, password, subject, message);
+                tui.printSendEmailSuccess(username, subject, message);
+                break;
+            } catch (RemoteException e) {
+                tui.printSendEmailFailure(username);
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println();
+                tui.printLogInFailure();
+            }
+        }
     }
 
     private void forgotPassword() {
+        while (true) {
+            tui.printForgotPassword();
+            String username = tui.getUserCommand("Username");
 
+            try {
+                lobby.sendForgotPasswordEmail(username, "");
+                System.out.println();
+                tui.printForgotPasswordSuccess(username);
+                break;
+            } catch (RemoteException e) {
+                tui.printForgotPasswordFailure();
+                break;
+            } catch (IllegalArgumentException e) {
+                tui.printForgotPasswordFailure();
+            }
+        }
     }
 
     private void newPassword() {
+        while (true) {
+            tui.printNewPassword();
+            String username = tui.getUserCommand("Username");
+            String oldPassword = tui.getUserCommand("Old Password");
+            String newPassword = tui.getUserCommand("New Password");
 
+            try {
+                lobby.changeUserPassword(username, oldPassword, newPassword);
+                System.out.println();
+                tui.printNewPasswordSuccess();
+                break;
+            } catch (RemoteException e) {
+                tui.printNewPasswordFailure();
+                break;
+            } catch (IllegalArgumentException e) {
+                tui.printNewPasswordFailure();
+            }
+        }
     }
 
 }

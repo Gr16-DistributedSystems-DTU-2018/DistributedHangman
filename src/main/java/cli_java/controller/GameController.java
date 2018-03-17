@@ -6,15 +6,13 @@ import cli_java.handler.UserHandler;
 import cli_java.ui.Tui;
 import server.logic.rmi.IGameLobby;
 import server.logic.rmi.IGameLogic;
-import server.util.Utils;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
 public final class GameController implements IGameController {
 
-    private final IGameLobby lobby;
+    private IGameLobby lobby;
     private IGameLogic logic;
 
     private final Tui tui = Tui.getInstance();
@@ -40,7 +38,6 @@ public final class GameController implements IGameController {
      */
     private GameController() throws Exception {
         scanner = new Scanner(System.in);
-        lobby = (IGameLobby) Naming.lookup(Utils.RMI_LOBBY_STUB_URL_LOCAL);
     }
 
     /*
@@ -50,13 +47,13 @@ public final class GameController implements IGameController {
         return instance;
     }
 
-    public void start() throws RemoteException {
+    public void start(IGameLobby lobby, IGameLogic logic) throws RemoteException {
+        this.lobby = lobby;
+        this.logic = logic;
+
         /* Reset the logic and score */
         logic.resetGame();
         logic.resetScore();
-
-        /* Clear screen */
-        tui.clearScreen();
 
         /* Get user */
         Bruger user;
@@ -80,7 +77,6 @@ public final class GameController implements IGameController {
             while (true) {
                 guess = tui.getUserCommand("Guess").charAt(0);
                 if (logic.isCharGuessed(guess)) {
-                    tui.clearScreen();
                     tui.printHangman(user.fornavn, logic.getLife(), logic.getScore(), logic.getWord(), logic.getGuessedChars());
                     tui.printAlreadyGuessed(guess);
                     continue;
@@ -88,16 +84,11 @@ public final class GameController implements IGameController {
                 break;
             }
 
-            /* Clear screen */
-            tui.clearScreen();
-
             /* Guess */
             if (logic.guess(guess)) {
-                //logic.addGameScore(Utils.SINGLE_CHAR_SCORE);
                 tui.printHangman(user.fornavn, logic.getLife(), logic.getScore(), logic.getWord(), logic.getGuessedChars());
                 tui.printCorrectGuess();
             } else {
-                //logic.decreaseLife();
                 tui.printHangman(user.fornavn, logic.getLife(), logic.getScore(), logic.getWord(), logic.getGuessedChars());
                 tui.printWrongGuess();
             }
@@ -111,11 +102,9 @@ public final class GameController implements IGameController {
 
                     logic.resetGame();
 
-                    tui.clearScreen();
                     tui.printHangman(user.fornavn, logic.getLife(), logic.getScore(), logic.getWord(), logic.getGuessedChars());
                 } else {
                     addHighScore(user);
-                    tui.clearScreen();
                     tui.printMenu(user);
                     break;
                 }
@@ -162,6 +151,7 @@ public final class GameController implements IGameController {
     private void showScore() {
         try {
             boolean isHighScore = logic.isHighScore(UserHandler.getCurrentUsername(), "godkode");
+            System.out.println();
             tui.printNewScore(Integer.toString(logic.getScore()), isHighScore);
         } catch (RemoteException e) {
             e.printStackTrace();
