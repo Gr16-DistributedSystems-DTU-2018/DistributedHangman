@@ -41,7 +41,7 @@ public final class MenuController implements IMenuController {
      */
     private MenuController() {
         try {
-            lobby = (IGameLobby) Naming.lookup(Utils.RMI_LOBBY_STUB_URL_LOCAL);
+            lobby = (IGameLobby) Naming.lookup(Utils.RMI_STUB_URL_REMOTE_LOBBY_JAVABOG);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             throw new RuntimeException("Failed to get the RMI Lobby stub!");
         }
@@ -114,7 +114,7 @@ public final class MenuController implements IMenuController {
                 break;
             case "a":
                 if (UserHandler.isLoggedIn()) {
-                    Map<String, Integer> highscoreMap = lobby.getAllUsersScore();
+                    Map<String, Integer> highscoreMap = lobby.getAllUsersHighscore();
                     tui.printHighScoreList(highscoreMap);
                 } else {
                     tui.printUnrecognizedCommand();
@@ -169,6 +169,7 @@ public final class MenuController implements IMenuController {
                 }
 
                 UserHandler.setCurrentUsername(username);
+                UserHandler.setCurrentPassword(password);
                 tui.printMenu(getUserHelper());
                 tui.printLogInSuccess();
                 break;

@@ -97,6 +97,8 @@ public final class GameController implements IGameController {
             if (isFinished(user, logic.isGameWon(), logic.isGameLost(), logic.getScore())) {
                 if (playAgain()) {
 
+                    addHighScore(user);
+
                     if (logic.isGameLost())
                         logic.resetScore();
 
@@ -150,8 +152,7 @@ public final class GameController implements IGameController {
     // if a high score was not acheived, just print the score.
     private void showScore() {
         try {
-            boolean isHighScore = logic.isHighScore(UserHandler.getCurrentUsername(), "godkode");
-            System.out.println();
+            boolean isHighScore = logic.isHighScore(UserHandler.getCurrentUsername(), UserHandler.getCurrentPassword());
             tui.printNewScore(Integer.toString(logic.getScore()), isHighScore);
         } catch (RemoteException e) {
             e.printStackTrace();

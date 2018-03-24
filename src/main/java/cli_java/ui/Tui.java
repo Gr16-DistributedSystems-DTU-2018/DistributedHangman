@@ -243,7 +243,6 @@ public final class Tui {
 
         sb.append("│ CampusNet ID : ").append(campusnetId).append("\n");
         sb.append("│ Username     : ").append(userName).append("\n");
-        sb.append("│ Password     : ").append(password).append("\n");
         sb.append("│                                       │\n");
         sb.append("│ First Name   : ").append(firstName).append("\n");
         sb.append("│ Last Name    : ").append(lastName).append("\n");

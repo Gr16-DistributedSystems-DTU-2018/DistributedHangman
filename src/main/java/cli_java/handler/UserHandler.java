@@ -6,6 +6,7 @@ public final class UserHandler {
 
     public final static String NOT_LOGGED_IN = "NONE";
     private static String currentUsername = NOT_LOGGED_IN;
+    private static String currentPassword = NOT_LOGGED_IN;
 
     static {
         try {
@@ -27,8 +28,20 @@ public final class UserHandler {
         currentUsername = username;
     }
 
+    public static void setCurrentPassword(String password) {
+        currentPassword = password;
+    }
+
     public static String getCurrentUsername() {
         return currentUsername;
+    }
+
+    public static String getCurrentPassword() {
+        return currentPassword;
+    }
+
+    public static void resetPassword() {
+        currentPassword = NOT_LOGGED_IN;
     }
 
     public static void resetUsername() {
