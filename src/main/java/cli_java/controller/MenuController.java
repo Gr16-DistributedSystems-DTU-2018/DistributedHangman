@@ -227,9 +227,10 @@ public final class MenuController implements IMenuController {
             String password = tui.getUserCommand("Password");
             String subject = tui.getUserCommand("Subject");
             String message = tui.getUserCommand("Message");
+            message += "\nSendt via Gruppe 16 - DistributedHangman";
 
             try {
-                subject = "Distributed Systems - Group 16: " + subject;
+                subject = "Distributed Systems - Gruppe 16: " + subject;
                 lobby.sendUserEmail(username, password, subject, message);
                 tui.printSendEmailSuccess(username, subject, message);
                 break;
@@ -249,7 +250,7 @@ public final class MenuController implements IMenuController {
             String username = tui.getUserCommand("Username");
 
             try {
-                lobby.sendForgotPasswordEmail(username, "");
+                lobby.sendForgotPasswordEmail(username, "Hilsen Gruppe 16 - DistributedHangman");
                 System.out.println();
                 tui.printForgotPasswordSuccess(username);
                 break;

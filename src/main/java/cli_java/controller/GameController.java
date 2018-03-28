@@ -94,7 +94,7 @@ public final class GameController implements IGameController {
             }
 
             /* Check if the user has won */
-            if (isFinished(user, logic.isGameWon(), logic.isGameLost(), logic.getScore())) {
+            if (isFinished(user, logic.isGameWon(), logic.isGameLost())) {
                 if (playAgain()) {
 
                     addHighScore(user);
@@ -107,6 +107,7 @@ public final class GameController implements IGameController {
                     tui.printHangman(user.fornavn, logic.getLife(), logic.getScore(), logic.getWord(), logic.getGuessedChars());
                 } else {
                     addHighScore(user);
+                    logic.resetScore();
                     tui.printMenu(user);
                     break;
                 }
@@ -115,7 +116,7 @@ public final class GameController implements IGameController {
         }
     }
 
-    private boolean isFinished(Bruger user, boolean isWon, boolean isLost, int score) {
+    private boolean isFinished(Bruger user, boolean isWon, boolean isLost) {
         try {
             if (isWon) {
                 tui.printWin(logic.getWord());
