@@ -106,7 +106,7 @@ public final class MenuController implements IMenuController {
                 break;
             case "t":
                 if (UserHandler.isLoggedIn()) {
-                    Map<String, Integer> scoreMap = lobby.getAllUsersScore();
+                    Map<String, Integer> scoreMap = lobby.getAllLoggedInUsersScore();
                     tui.printLobby(scoreMap);
                 } else {
                     tui.printUnrecognizedCommand();
