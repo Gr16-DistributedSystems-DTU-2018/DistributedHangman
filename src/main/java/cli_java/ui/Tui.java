@@ -122,7 +122,7 @@ public final class Tui {
     /*
      * Method to print menu screen.
      */
-    public final void printMenu(Bruger user) {
+    public final void printMenu(Bruger user, int userAmount) {
         StringBuilder sb = new StringBuilder();
 
         String loggedInMessage = "Not Logged In";
@@ -135,6 +135,14 @@ public final class Tui {
         sb.append("│    Distributed Hangman!   │\n");
         sb.append("├───────────────────────────┤\n"); // 27 chars long without the two |
 
+        if (userAmount > 9 && userAmount < 100)
+            sb.append("│ Users online: ").append(userAmount).append("          │\n");   // 10 up to 99
+        else if (userAmount > 100 && userAmount < 999)
+            sb.append("│ Users online: ").append(userAmount).append("         │\n");    // 100 up to 999
+        else
+            sb.append("│ Users online: ").append(userAmount).append("           │\n");  // 0 and up to 9
+
+        sb.append("├───────────────────────────┤\n");
         String text = parseString(loggedInMessage, 27, true);
         sb.append(text).append("\n");
 

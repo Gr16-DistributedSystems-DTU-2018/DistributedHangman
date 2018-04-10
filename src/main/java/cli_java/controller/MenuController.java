@@ -56,11 +56,19 @@ public final class MenuController implements IMenuController {
 
     @Override
     public void start() {
-        tui.printMenu(getUserHelper());
+        try {
+            tui.printMenu(getUserHelper(), lobby.getUserAmount());
+        } catch (RemoteException e) {
+            tui.printMenu(getUserHelper(), -1);
+        }
 
         while (true) {
             String command = tui.getUserCommand();
-            tui.printMenu(getUserHelper());
+            try {
+                tui.printMenu(getUserHelper(), lobby.getUserAmount());
+            } catch (RemoteException e) {
+                tui.printMenu(getUserHelper(), -1);
+            }
 
             try {
                 executeUserCommand(command);
@@ -170,11 +178,15 @@ public final class MenuController implements IMenuController {
 
                 UserHandler.setCurrentUsername(username);
                 UserHandler.setCurrentPassword(password);
-                tui.printMenu(getUserHelper());
+                tui.printMenu(getUserHelper(), lobby.getUserAmount());
                 tui.printLogInSuccess();
                 break;
             } catch (RemoteException e) {
-                tui.printMenu(getUserHelper());
+                try {
+                    tui.printMenu(getUserHelper(), lobby.getUserAmount());
+                } catch (RemoteException e1) {
+                    tui.printMenu(getUserHelper(), -1);
+                }
                 tui.printLogInFailure();
                 break;
             } catch (IllegalArgumentException e) {
@@ -193,10 +205,14 @@ public final class MenuController implements IMenuController {
             } else {
                 return;
             }
-            tui.printMenu(getUserHelper());
+            tui.printMenu(getUserHelper(), lobby.getUserAmount());
             tui.printLogOutSuccess();
         } catch (RemoteException e) {
-            tui.printMenu(getUserHelper());
+            try {
+                tui.printMenu(getUserHelper(), lobby.getUserAmount());
+            } catch (RemoteException e1) {
+                tui.printMenu(getUserHelper(), -1);
+            }
             tui.printLogOutFailure();
         }
     }

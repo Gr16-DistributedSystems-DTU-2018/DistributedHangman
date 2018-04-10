@@ -108,7 +108,7 @@ public final class GameController implements IGameController {
                 } else {
                     addHighScore(user);
                     logic.resetScore();
-                    tui.printMenu(user);
+                    tui.printMenu(user, lobby.getUserAmount());
                     break;
                 }
             }
